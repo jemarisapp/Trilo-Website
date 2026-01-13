@@ -29,3 +29,11 @@ export interface PricingPlan {
   features: string[];
   isPopular?: boolean;
 }
+
+export interface DiscordUser {
+  id: string;
+  username: string;
+  discriminator: string;
+  avatar: string;
+  email?: string;
+}
