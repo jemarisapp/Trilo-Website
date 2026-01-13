@@ -68,7 +68,7 @@ export const DiscordProvider: React.FC<{ children: ReactNode }> = ({ children })
                 navigate(cleanPath, { replace: true });
             }
 
-            fetch(`http://localhost:3001/api/discord/callback?code=${code}`)
+            fetch(`/api/discord/callback?code=${code}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.success && data.user) {
@@ -110,7 +110,7 @@ export const DiscordProvider: React.FC<{ children: ReactNode }> = ({ children })
         if (!discordUser) return;
 
         try {
-            const response = await fetch('http://localhost:3001/api/stripe/portal', {
+            const response = await fetch('/api/stripe/portal', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

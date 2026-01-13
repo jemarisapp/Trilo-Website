@@ -68,7 +68,7 @@ export const Pricing: React.FC = () => {
       // Call checkout API with Discord user info
       const priceId = isAnnual ? STRIPE_PRICE_ID_ANNUAL : STRIPE_PRICE_ID_MONTHLY;
 
-      const response = await fetch('http://localhost:3001/api/stripe/checkout', {
+      const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
