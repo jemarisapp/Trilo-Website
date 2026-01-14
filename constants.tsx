@@ -64,20 +64,26 @@ export const SETUP_GUIDE: SetupSection[] = [
       },
       {
         id: "2.2",
-        title: "Get subscription — go to trilo.gg/pricing or run /admin purchase",
+        title: "Purchase a license at trilo.gg/pricing",
         displayTitle: (
           <>
-            Get subscription — go to <a href="#/pricing" className="text-trilo-orange hover:underline">trilo.gg/pricing</a> or run <code className="bg-white/10 px-1 rounded text-trilo-yellow font-mono text-sm">/admin purchase</code>
+            Purchase a license at <a href="#/pricing" className="text-trilo-orange hover:underline">trilo.gg/pricing</a>
           </>
         ),
-        command: "/admin purchase",
-        notes: "All Trilo features and commands require an active subscription to function."
+        button: { label: "View Pricing", url: "https://trilo.gg/pricing" },
+        notes: "After purchase, you'll receive a license key via Discord DM. One license works on up to 3 servers."
       },
       {
         id: "2.3",
-        title: "Check Subscription",
-        command: "/admin check-subscription",
-        notes: "Verify that your server has access."
+        title: "Activate with your license key",
+        command: "/admin activate license_key:TRILO-XXXX-XXXX-XXXX",
+        notes: "Replace with your actual license key. License keys look like: TRILO-XXXX-XXXX-XXXX"
+      },
+      {
+        id: "2.4",
+        title: "Verify activation",
+        command: "/admin license-info",
+        notes: "View your license status, expiration date, and activation slots."
       }
     ]
   },

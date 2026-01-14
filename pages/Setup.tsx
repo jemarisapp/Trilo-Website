@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   CheckCircle2, Circle, Copy, Check, Search,
-  Terminal as TerminalIcon, ShieldAlert, Zap,
+  Terminal as TerminalIcon, ShieldAlert,
   Menu, ChevronDown, ChevronRight, ExternalLink
 } from 'lucide-react';
 import { Card } from '../components/UI/Card';
@@ -128,11 +128,6 @@ export const Setup: React.FC = () => {
                                   {step.displayTitle || step.title}
                                 </h3>
                               </div>
-                              {step.isPro && (
-                                <span className="flex items-center gap-1 text-[10px] font-bold text-trilo-yellow uppercase bg-trilo-yellow/10 px-2 py-0.5 rounded border border-trilo-yellow/20">
-                                  <Zap size={10} /> Pro Tier
-                                </span>
-                              )}
                             </div>
 
                             {step.notes && (

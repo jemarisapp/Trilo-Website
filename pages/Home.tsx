@@ -1,11 +1,12 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, ChevronRight, Zap, Trophy, ShieldCheck, Users, Calendar, Award } from 'lucide-react';
+import { ArrowRight, ChevronRight } from 'lucide-react';
 import { Button } from '../components/UI/Button';
 import { Card } from '../components/UI/Card';
 import { FEATURES, BOT_INVITE_URL, DISCORD_SUPPORT_URL } from '../constants';
 import { useNavigate } from 'react-router-dom';
+import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -46,26 +47,10 @@ export const Home: React.FC = () => {
             </Button>
           </div>
         </motion.div>
-      </section>
 
-      {/* Stats / Proof */}
-      <section className="py-12 border-y border-white/5 bg-trilo-dark/50">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[
-              { label: 'AI-Powered Matchups', icon: <Zap size={24} className="text-trilo-orange" /> },
-              { label: 'Team Management', icon: <Users size={24} className="text-trilo-orange" /> },
-              { label: 'Attribute Points', icon: <Award size={24} className="text-trilo-orange" /> },
-              { label: '24/7 Uptime', icon: <ShieldCheck size={24} className="text-trilo-orange" /> },
-            ].map((item, i) => (
-              <div key={i} className="flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-xl bg-trilo-orange/10 border border-trilo-orange/20 flex items-center justify-center">
-                  {item.icon}
-                </div>
-                <div className="text-sm text-gray-400 font-medium">{item.label}</div>
-              </div>
-            ))}
-          </div>
+        {/* Hero Visual - Before/After Slider */}
+        <div className="mt-16 mb-8">
+          <BeforeAfterSlider />
         </div>
       </section>
 
@@ -76,17 +61,20 @@ export const Home: React.FC = () => {
           <p className="text-gray-400 max-w-xl mx-auto">Everything you need to run your dynasty league<br />professionally without the manual headache.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {FEATURES.map((feature, i) => (
             <Card key={i} className="group relative overflow-hidden">
               <div className="mb-4">{feature.icon}</div>
               <h3 className="text-xl font-heading font-bold text-white mb-2">{feature.title}</h3>
               <p className="text-gray-400 text-sm leading-relaxed">{feature.description}</p>
-              {feature.isPro && (
-                <div className="absolute top-4 right-4 bg-trilo-orange/10 border border-trilo-orange/20 text-trilo-orange text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded">Pro Tier</div>
-              )}
             </Card>
           ))}
+        </div>
+
+        <div className="text-center">
+          <Button variant="secondary" size="lg" onClick={() => navigate('/features')}>
+            See All Features <ArrowRight className="ml-2" size={20} />
+          </Button>
         </div>
       </section>
 
