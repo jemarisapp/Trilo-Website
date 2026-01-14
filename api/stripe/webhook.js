@@ -23,12 +23,12 @@ export const config = {
   },
 };
 
-// Helper to get raw body
+// Helper to get raw body as string (Stripe needs string, not Buffer)
 async function getRawBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     req.on('data', (chunk) => chunks.push(chunk));
-    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
     req.on('error', reject);
   });
 }
@@ -41,6 +41,11 @@ export default async function handler(req, res) {
 
   const sig = req.headers['stripe-signature'];
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!sig || !endpointSecret) {
+    console.error('Missing signature or webhook secret');
+    return res.status(400).send('Webhook Error: Missing signature or secret');
+  }
 
   let event;
 
