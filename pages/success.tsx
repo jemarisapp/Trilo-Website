@@ -27,7 +27,7 @@ export default function Success() {
 
     const fetchLicense = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_SITE_URL || 'http://localhost:3000'}/api/stripe/license?session_id=${sid}`);
+        const res = await fetch(`/api/stripe/license?session_id=${sid}`);
 
         // If 404, it might just not be ready yet
         if (res.status === 404) {
