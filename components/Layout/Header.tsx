@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { Button } from '../UI/Button';
 import { BOT_INVITE_URL } from '../../constants';
 import { useDiscordUser } from '../../contexts/DiscordContext';
@@ -30,8 +30,26 @@ export const DiscordIcon = () => (
 export const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
+  const toolsRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const { discordUser, login } = useDiscordUser();
+
+  // Close the desktop dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (toolsRef.current && !toolsRef.current.contains(e.target as Node)) {
+        setToolsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const toolsItems = [
+    { name: 'CFP Bracket Predictor', path: '/tools/cfp-bracket' },
+  ];
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -68,6 +86,40 @@ export const Header: React.FC = () => {
               {link.name}
             </Link>
           ))}
+
+          {/* Tools dropdown */}
+          <div
+            ref={toolsRef}
+            className="relative"
+            onMouseEnter={() => setToolsOpen(true)}
+            onMouseLeave={() => setToolsOpen(false)}
+          >
+            <button
+              onClick={() => setToolsOpen(true)}
+              className={`flex items-center gap-1 text-sm font-semibold transition-colors hover:text-trilo-orange ${toolsItems.some((t) => location.pathname === t.path) ? 'text-trilo-orange' : 'text-gray-400'}`}
+            >
+              Tools
+              <ChevronDown
+                size={14}
+                className={`transition-transform duration-200 ${toolsOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+
+            {toolsOpen && (
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-52 rounded-xl bg-trilo-card border border-white/10 shadow-xl overflow-hidden z-50">
+                {toolsItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setToolsOpen(false)}
+                    className={`block px-4 py-3 text-sm font-semibold transition-colors hover:bg-trilo-orange/10 hover:text-trilo-orange ${location.pathname === item.path ? 'text-trilo-orange' : 'text-gray-300'}`}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
 
           {discordUser ? (
             <div className="flex items-center gap-3 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
@@ -116,6 +168,35 @@ export const Header: React.FC = () => {
               {link.name}
             </Link>
           ))}
+
+          {/* Mobile Tools section */}
+          <div>
+            <button
+              onClick={() => setMobileToolsOpen((prev) => !prev)}
+              className="flex items-center gap-2 text-2xl font-heading font-bold w-full text-left"
+            >
+              Tools
+              <ChevronDown
+                size={20}
+                className={`transition-transform duration-200 mt-1 ${mobileToolsOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {mobileToolsOpen && (
+              <div className="mt-3 ml-2 flex flex-col gap-1 border-l-2 border-trilo-orange/40 pl-4">
+                {toolsItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => { setIsOpen(false); setMobileToolsOpen(false); }}
+                    className="flex items-center text-base font-semibold text-gray-300 hover:text-trilo-orange transition-colors"
+                    style={{ minHeight: '44px' }}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
 
           {discordUser ? (
             <div className="flex items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/5">

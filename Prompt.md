@@ -1,212 +1,115 @@
-# Trilo Website - AI Builder Prompt
+# Trilo Site - Implementation Prompt
 
-## Overview
-Build a modern marketing website for **Trilo**, a Discord bot that automates dynasty sports league management. The site should be professional, dark-themed, and conversion-focused.
+Use this prompt when extending or redesigning the existing Trilo site. It reflects the current codebase, not the original greenfield concept.
 
----
+## Goal
 
-## Technical Requirements
+Evolve the current Trilo marketing and billing site without changing the core architecture or product flow.
 
-- **Framework**: Next.js 15 with App Router
-- **Styling**: Tailwind CSS 4
-- **Fonts**: Outfit (Headings) + Geist Sans (Body) + Geist Mono (Code)
-- **Icons**: Lucide React
-- **Animations**: Framer Motion (subtle, professional)
-- **Deployment**: Vercel
-- **Dark Mode**: Default to dark theme
+## Technical Constraints
 
----
+- **Framework:** Vite 6 + React 19 SPA
+- **Language:** TypeScript
+- **Routing:** `react-router-dom` 7
+- **Styling:** existing utility-class approach and theme config in `index.html`
+- **Animation:** Framer Motion
+- **Icons:** Lucide React
+- **Deployment:** Vercel static frontend plus `/api/*` serverless functions
+- **Do not switch the project to Next.js unless that migration is an explicit requirement**
 
-## Brand Guidelines
+## Existing Routes To Preserve
+
+- `/`
+- `/features`
+- `/pricing`
+- `/setup`
+- `/success`
+- `/privacy`
+- `/terms`
+- `/auth/callback`
+
+## Product Constraints
+
+- The home page should stay conversion-focused and commissioner-oriented.
+- The pricing page is live, not conceptual.
+- The purchase flow includes Discord OAuth, Stripe checkout, a success page, and license activation guidance.
+- The setup guide is interactive and should continue supporting progress tracking, command search, and copy-to-clipboard actions.
+- Legal pages should remain accessible from the main site navigation/footer.
+
+## Current Pricing Model
+
+- free trial option
+- one paid Trilo subscription
+- monthly and annual billing toggle
+- billing managed through Stripe customer portal
+
+## Brand Direction
 
 ### Colors
 
-**Primary Palette:**
-- **Trilo Orange**: #FF6B35 (primary CTA, highlights)
-- **Trilo Yellow**: #F3AA07 (accents, secondary highlights)
-- **Gradient**: #FF6B35 → #F3AA07 at 135deg (hero backgrounds, buttons)
-
-**Dark Theme:**
-- **Body Background**: #121212
-- **Cards/Header**: #1A1A1A
-- **Sections**: #101010 or #090909
-- **Card Elevated**: #2D2D2D
-
-**Utility:**
-- **Text Primary**: #FFFFFF
-- **Text Secondary**: #9CA3AF (Tailwind gray-400)
-- **Discord Button**: #5865F2
-- **Success/Active**: #10B981
-- **Standard Grays**: Tailwind gray scale
+- Trilo Orange: `#FF6B35`
+- Trilo Yellow: `#F3AA07`
+- Background: `#121212`
+- Elevated surfaces: `#1A1A1A` to `#2D2D2D`
+- Discord accent: `#5865F2`
 
 ### Typography
-- **Headings**: Outfit, Bold, tight tracking (Sports/Tech vibe)
-- **Body**: Geist Sans, Normal weight, relaxed leading
-- **Code/Technical**: Geist Mono
 
-### Visual Style: "Electric Dark Mode"
-- **Aesthetic**: High-impact sports tech × Modern dark mode SaaS. Think "Nike Tech meets Vercel".
-- **Backgrounds**: Deep blacks with subtle "grid" or "noise" patterns to add texture.
-- **Lighting**: Dramatic radial gradient glows using Trilo Orange/Yellow behind key elements (hero text, feature cards).
-- **Cards**: Dark glassmorphism (backdrop-blur) with thin, subtle gradient borders that light up on hover.
-- **Layout**: "Bento Grid" style for features (asymmetrical, highly structured grid).
-- **Whitespace**: Generous breathing room to make the "pop" elements stand out.
+- Headings: Outfit
+- Body: Geist Sans
+- Mono/code: Geist Mono
 
-### Animation & Effects
-- **Glow Effects**: Conic gradient glows behind the "Add to Discord" button.
-- **Scroll Reveal**: Elements fade up and scale in slightly as you scroll.
-- **Hover States**:
-  - Cards lift slightly and borders glow brighter.
-  - Buttons have a subtle "shine" effect on hover.
-- **Hero Animation**: Slow, drifting gradient mesh in the background (Orange/Yellow).
-- **Numbers**: Animated number counters for "Stats" (if used).
+### Style
 
----
+- electric dark-mode aesthetic
+- strong gradients and glow treatments
+- glassy dark cards
+- sports-tech tone instead of generic SaaS minimalism
+- clear, bold CTAs
 
-## Pages to Build
+## Core Experiences
 
-### 1. Home Page (`/`)
+### Home
 
-**Hero Section:**
-- Headline: "Dynasty League Management, Automated"
-- Subheadline: "The Discord bot that handles matchups, teams, and points so you can focus on winning."
-- Primary CTA: "Add to Discord" (links to Discord bot invite)
-- Secondary CTA: "See Features"
-- Background: Subtle animated gradient or grid pattern
+- headline-driven hero
+- invite/community CTAs
+- feature summary
+- quick "how it works" explanation
 
-**Features Section:**
-- 4-6 feature cards with icons
-- Features:
-  - ⚡ AI-Powered Matchups (upload screenshots, get channels)
-  - 👥 Team Management (assign users, track ownership)
-  - 🎯 Attribute Points (award, track, approve upgrades)
-  - 📢 Smart Messaging (announcements, advance notifications)
-  - ⚙️ Customizable Settings (commissioner roles, log channels)
-  - 🏈 CFB & NFL Support
+### Features
 
-**How It Works Section:**
-- 3 steps:
-  1. Add Trilo to your Discord server
-  2. Configure your league settings
-  3. Automate everything
+- deeper explanation of Trilo capabilities
+- screenshots or previews where helpful
 
-**Social Proof (Optional):**
-- "Used by X dynasty leagues"
-- Discord server activity stats
+### Pricing
 
-**CTA Section:**
-- "Ready to automate your league?"
-- Repeat primary CTA
+- Discord connect state
+- monthly/annual toggle
+- clear subscription CTA
+- support for manage-subscription state
 
-**Footer:**
-- Links: Features, Pricing, Privacy Policy, Terms
-- Discord invite link
-- Copyright
+### Setup
 
----
+- sectioned onboarding
+- command copy actions
+- progress saved in local storage
 
-### 2. Features Page (`/features`)
+### Success
 
-Detailed breakdown of each feature with:
-- Icon
-- Title
-- Description
-- Screenshot or demo GIF (placeholder for now)
+- post-checkout confirmation
+- license retrieval
+- clear next steps for Discord activation
 
----
+## Implementation Guidance
 
-### 3. Pricing Page (`/pricing`)
+- reuse existing components, routes, and constants where possible
+- prefer enhancing the current structure over rebuilding from scratch
+- keep `/api/*` expectations intact for Stripe and Discord
+- keep copy and design aligned with the live product, not an earlier "Stripe coming soon" concept
 
-**Tiers:**
+## Nice Follow-Ups
 
-| Feature | Free Trial | Core | Pro |
-|---------|------------|------|-----|
-| Team Management | ✅ | ✅ | ✅ |
-| Manual Matchups | ✅ | ✅ | ✅ |
-| Messaging Tools | ✅ | ✅ | ✅ |
-| AI Image Matchups | ❌ | ❌ | ✅ |
-| Bulk Operations | ❌ | ❌ | ✅ |
-| Priority Support | ❌ | ❌ | ✅ |
-
-**Pricing:**
-- Free Trial: 10 days
-- Core: $7.99/month or $35.99/year
-- Pro: $14.99/month or $59.99/year
-
-**Note:** Stripe integration coming soon. For now, CTA should say "Contact for Pricing" linking to Discord.
-
----
-
-### 4. Privacy Policy (`/privacy`)
-
-Static page with privacy policy content. Can pull from existing PRIVACY_POLICY.md.
-
----
-
-### 5. Terms of Service (`/terms`)
-
-Static page with terms. Simple placeholder for now.
-
----
-
-## Components to Build
-
-### Global
-- `Header` - Logo, nav links, "Add to Discord" button
-- `Footer` - Links, Discord, copyright
-- `Button` - Primary/secondary variants
-- `Card` - For features, pricing tiers
-- `SectionHeader` - Consistent section title styling
-
-### Home Page
-- `Hero` - Full-width hero with CTAs
-- `FeatureCard` - Icon + title + description
-- `HowItWorks` - Numbered steps
-- `CTABanner` - Full-width CTA section
-
-### Pricing Page
-- `PricingCard` - Per tier
-- `PricingTable` - Feature comparison
-- `Toggle` - Monthly/Annual switch
-
----
-
-## Assets Needed
-
-> **Note:** These are placeholders. Add actual assets after downloading the code.
-
-- **Logo**: `[PLACEHOLDER]` - Replace with Trilo logo
-- **OG Image**: `[PLACEHOLDER]` - 1200x630 for social sharing
-- **Favicon**: `[PLACEHOLDER]` - 32x32 and 16x16
-- **Screenshots**: `[PLACEHOLDER]` - Bot in action screenshots
-- **Discord Invite**: `[PLACEHOLDER]` - Bot invite URL
-- **Discord Support**: `[PLACEHOLDER]` - Support server invite
-
----
-
-## SEO Requirements
-
-- Meta title: "Trilo - Dynasty League Discord Bot | Automate Your League"
-- Meta description: "Trilo is the Discord bot that automates matchups, teams, and attribute points for dynasty sports leagues. Save hours every week."
-- OG image for social sharing
-- Proper heading hierarchy (single h1 per page)
-
----
-
-## Nice-to-Haves (Phase 2)
-
-- [ ] Stripe checkout integration
-- [ ] Customer portal link
-- [ ] Blog/changelog (MDX)
-- [ ] Interactive demo
-- [ ] Discord server widget
-
----
-
-## Reference Sites
-
-For design inspiration:
-- https://linear.app (clean SaaS)
-- https://vercel.com (modern, dark)
-- https://resend.com (developer-focused)
-- https://cal.com (feature-rich landing)
+- improve local full-stack developer workflow
+- consolidate duplicate legacy API handlers
+- move styling config from CDN runtime setup into a local build pipeline
+- add analytics and test coverage around auth and checkout flows

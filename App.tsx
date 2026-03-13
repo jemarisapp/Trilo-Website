@@ -9,6 +9,7 @@ import { Pricing } from './pages/Pricing';
 import { Setup } from './pages/Setup';
 import { Legal } from './pages/Legal';
 import Success from './pages/success';
+import { BracketPage } from './pages/BracketPage';
 import { DiscordProvider } from './contexts/DiscordContext';
 
 // ScrollToTop component to reset scroll on route change
@@ -34,6 +35,7 @@ const App: React.FC = () => {
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/setup" element={<Setup />} />
               <Route path="/success" element={<Success />} />
+              <Route path="/tools/cfp-bracket" element={<BracketPage />} />
               <Route path="/auth/callback" element={<Pricing />} />
               <Route
                 path="/privacy"

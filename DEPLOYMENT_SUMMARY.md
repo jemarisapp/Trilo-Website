@@ -1,110 +1,111 @@
-# 🚀 Deployment Ready - Quick Summary
+# Trilo Site - Deployment Notes
 
-## What Was Done
+## Current Deployment Model
 
-Converted your `api-server.js` to **Vercel serverless functions** for production deployment.
+The production site is split into two parts:
 
-## File Changes
+- a Vite-built React SPA for the frontend
+- Vercel serverless functions in `api/` for Discord and Stripe operations
 
-### ✅ Created (New API Routes)
-```
+`vercel.json` rewrites all non-API routes to `index.html`, which lets client-side routes like `/pricing` and `/setup` work in production.
+
+## API Surface
+
+Production handlers currently live in:
+
+```text
 api/
-├── _helpers.js               # Shared functions
+├── _helpers.js
 ├── discord/
-│   └── callback.js          # OAuth callback
+│   └── callback.js
 └── stripe/
-    ├── checkout.js          # Create checkout
-    ├── license.js           # Get license key
-    ├── portal.js            # Billing portal
-    └── webhook.js           # Webhook handler
+    ├── checkout.js
+    ├── license.js
+    ├── portal.js
+    ├── webhook.js
+    └── webhook-debug.js
 ```
 
-### ✅ Updated (Frontend)
-- `pages/Pricing.tsx` → Uses `/api/stripe/checkout`
-- `contexts/DiscordContext.tsx` → Uses `/api/discord/callback` and `/api/stripe/portal`
+The repository also contains `api-server.js`. That file is still useful as a local helper path, but it is not the main production deployment target.
 
-### ❌ Can Delete (Optional)
-- `api-server.js` - No longer needed
+## Required Environment Variables
 
-## To Deploy
+Client-facing variables:
 
-### 1. Commit & Push to Vercel
+- `VITE_SITE_URL`
+- `VITE_DISCORD_CLIENT_ID`
+- `VITE_STRIPE_PRICE_ID_MONTHLY`
+- `VITE_STRIPE_PRICE_ID_ANNUAL`
 
-```bash
-cd /Users/jsapp/Documents/Trilo/Trilo-Site
+Server-side variables:
 
-git add api/
-git add pages/Pricing.tsx
-git add contexts/DiscordContext.tsx
-git commit -m "Convert to Vercel serverless functions"
-git push origin main
-```
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `DISCORD_CLIENT_ID`
+- `DISCORD_CLIENT_SECRET`
+- `DISCORD_TOKEN`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_ANON_KEY`
 
-Vercel will auto-deploy!
+## Production Setup Checklist
 
-### 2. Add Environment Variables to Vercel
+### 1. Deploy to Vercel
 
-Go to: Vercel Dashboard → Project → Settings → Environment Variables
+- connect the repository to Vercel
+- use the Vite build output
+- keep the SPA rewrite in `vercel.json`
 
-Copy all variables from your `.env.local` and add them to Vercel.
+### 2. Set the production site URL
 
-**Important:** For production, update these to LIVE keys:
-- `STRIPE_SECRET_KEY` → Use `sk_live_...`
-- `VITE_STRIPE_PUBLISHABLE_KEY` → Use `pk_live_...`
-- `VITE_SITE_URL` → Set to `https://trilo.gg`
-- `DISCORD_REDIRECT_URI` → Set to `https://trilo.gg/auth/callback`
+- `VITE_SITE_URL=https://trilo.gg`
 
-### 3. Configure Discord OAuth Redirect
+### 3. Configure Discord OAuth
 
-Discord Developer Portal → OAuth2 → Add Redirect:
-```
+Add this redirect URI in the Discord developer portal:
+
+```text
 https://trilo.gg/auth/callback
 ```
 
-### 4. Configure Stripe Webhook
+### 4. Configure Stripe
 
-Stripe Dashboard → Webhooks → Add Endpoint:
-```
-URL: https://trilo.gg/api/stripe/webhook
-Events: checkout.session.completed, customer.subscription.*
-```
+Use the production webhook endpoint:
 
-Copy the webhook secret and add to Vercel as `STRIPE_WEBHOOK_SECRET`.
-
-### 5. Deploy Bot to Railway
-
-```bash
-cd /Users/jsapp/Documents/Trilo/Trilo
-
-git add .
-git commit -m "Add Discord DM delivery"
-git push origin main
+```text
+https://trilo.gg/api/stripe/webhook
 ```
 
-## Testing Checklist
+Recommended event coverage:
 
-After deploying:
+- `checkout.session.completed`
+- `customer.subscription.created`
+- `customer.subscription.updated`
+- `customer.subscription.deleted`
 
-- [ ] Visit https://trilo.gg/pricing
-- [ ] Click subscribe → Discord OAuth works
-- [ ] Shows "Connected as Username"
-- [ ] Complete checkout → License key generated
-- [ ] Success page displays key
-- [ ] Received Discord DM with key
-- [ ] `/admin activate` works in Discord
+## Post-Deploy Smoke Test
 
-## Full Documentation
+- visit `/`
+- visit `/features`
+- visit `/pricing`
+- connect Discord successfully
+- start Stripe checkout successfully
+- confirm `/success` loads the license details
+- verify customer portal access from the pricing page
+- verify webhook processing updates the backing data
 
-For detailed steps, see:
-- `/Users/jsapp/Documents/Trilo/Trilo/PRODUCTION_DEPLOYMENT.md`
-- `/Users/jsapp/Documents/Trilo/Trilo/DISCORD_OAUTH_SETUP.md`
+## Local Development Caveat
 
-## Local Testing Still Works
+`npm run dev` starts the frontend only. The site's purchase and auth flows expect same-origin `/api/*` endpoints, so there is not yet a fully documented one-command local full-stack workflow.
 
-You can still test locally:
-```bash
-# Just run the frontend
-npm run dev
-```
+Today, local end-to-end API testing requires extra setup, such as:
 
-The `/api` routes work in both local and production!
+- running a Vercel-compatible local workflow for the `api/` functions
+- pointing the frontend to a local backend during development
+- using `api-server.js` as a helper for Stripe and Discord experiments
+
+## Recommended Cleanup
+
+- add an npm script or documented workflow for local API testing
+- consolidate legacy API files under `pages/api/`
+- decide whether `api-server.js` stays as a supported local path or is removed after the local dev story is replaced
