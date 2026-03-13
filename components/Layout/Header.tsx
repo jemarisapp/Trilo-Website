@@ -106,17 +106,19 @@ export const Header: React.FC = () => {
             </button>
 
             {toolsOpen && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-52 rounded-xl bg-trilo-card border border-white/10 shadow-xl overflow-hidden z-50">
-                {toolsItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setToolsOpen(false)}
-                    className={`block px-4 py-3 text-sm font-semibold transition-colors hover:bg-trilo-orange/10 hover:text-trilo-orange ${location.pathname === item.path ? 'text-trilo-orange' : 'text-gray-300'}`}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
+              <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50">
+                <div className="w-52 rounded-xl bg-trilo-card border border-white/10 shadow-xl overflow-hidden">
+                  {toolsItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setToolsOpen(false)}
+                      className={`block px-4 py-3 text-sm font-semibold transition-colors hover:bg-trilo-orange/10 hover:text-trilo-orange ${location.pathname === item.path ? 'text-trilo-orange' : 'text-gray-300'}`}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
               </div>
             )}
           </div>

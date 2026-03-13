@@ -7,6 +7,7 @@ interface SeedPickerProps {
   seeds: SeedAssignments;
   onSeedChange: (seed: number, teamName: string) => void;
   onLockIn: () => void;
+  onScanImage?: () => void;
 }
 
 const SEED_LABELS: Record<number, string> = {
@@ -24,7 +25,7 @@ const SEED_LABELS: Record<number, string> = {
   12: 'First Round',
 };
 
-export const SeedPicker = ({ seeds, onSeedChange, onLockIn }: SeedPickerProps) => {
+export const SeedPicker = ({ seeds, onSeedChange, onLockIn, onScanImage }: SeedPickerProps) => {
   const assignedNames = Object.values(seeds).filter(Boolean) as string[];
   const filled = allSeedsFilled(seeds);
 
@@ -67,16 +68,67 @@ export const SeedPicker = ({ seeds, onSeedChange, onLockIn }: SeedPickerProps) =
         >
           Assign Your Seeds
         </h2>
-        <p style={{ color: '#888', fontSize: 14, marginTop: 8 }}>
-          Pick which team belongs to each seed. Seeds 1-4 receive first round byes.
+        <p style={{ color: '#888', fontSize: 14, marginTop: 8, marginBottom: 0 }}>
+          Assign all 12 seeds to build your bracket.
         </p>
       </div>
+
+      {/* Scan banner */}
+      {onScanImage && (
+        <button
+          onClick={onScanImage}
+          style={{
+            width: '100%',
+            background: 'linear-gradient(135deg, rgba(249,115,22,0.08) 0%, rgba(249,115,22,0.04) 100%)',
+            border: '1px solid rgba(249,115,22,0.22)',
+            borderRadius: 12,
+            padding: '14px 18px',
+            marginBottom: 20,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 14,
+            cursor: 'pointer',
+            textAlign: 'left',
+            transition: 'border-color 0.2s, background 0.2s',
+            fontFamily: "'Barlow Condensed', 'Arial Narrow', Arial, sans-serif",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(249,115,22,0.55)';
+            (e.currentTarget as HTMLButtonElement).style.background = 'linear-gradient(135deg, rgba(249,115,22,0.13) 0%, rgba(249,115,22,0.07) 100%)';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(249,115,22,0.22)';
+            (e.currentTarget as HTMLButtonElement).style.background = 'linear-gradient(135deg, rgba(249,115,22,0.08) 0%, rgba(249,115,22,0.04) 100%)';
+          }}
+        >
+          {/* Camera icon */}
+          <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, background: 'rgba(249,115,22,0.12)', borderRadius: 8 }}>
+            <svg width="20" height="18" viewBox="0 0 20 18" fill="none">
+              <path d="M7.5 2L6 4H2C1.45 4 1 4.45 1 5V16C1 16.55 1.45 17 2 17H18C18.55 17 19 16.55 19 16V5C19 4.45 18.55 4 18 4H14L12.5 2H7.5Z" stroke="#F97316" strokeWidth="1.5" strokeLinejoin="round" fill="none"/>
+              <circle cx="10" cy="10.5" r="3.5" stroke="#F97316" strokeWidth="1.5" fill="none"/>
+              <circle cx="10" cy="10.5" r="1.5" fill="#F97316"/>
+            </svg>
+          </div>
+          {/* Text */}
+          <div style={{ flex: 1 }}>
+            <div style={{ color: '#fff', fontWeight: 800, fontSize: 14, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              Scan Bracket Image
+            </div>
+          </div>
+          {/* Arrow */}
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, opacity: 0.4 }}>
+            <path d="M6 3L11 8L6 13" stroke="#F97316" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      )}
 
       {/* Seed Grid */}
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gridTemplateColumns: '1fr 1fr',
+          gridTemplateRows: 'repeat(6, auto)',
+          gridAutoFlow: 'column',
           gap: 10,
           marginBottom: 28,
         }}

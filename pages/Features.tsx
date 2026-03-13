@@ -183,11 +183,11 @@ export const Features: React.FC = () => {
             <div className="bg-trilo-orange/5 rounded-xl p-6 border border-trilo-orange/20">
               <h4 className="text-trilo-orange font-heading font-bold mb-4">With Trilo</h4>
               <ul className="space-y-3 text-sm text-gray-400">
-                <li className="flex items-start gap-2"><span className="text-trilo-orange">✓</span> Upload screenshot → channels created</li>
-                <li className="flex items-start gap-2"><span className="text-trilo-orange">✓</span> AI reads your schedule automatically</li>
-                <li className="flex items-start gap-2"><span className="text-trilo-orange">✓</span> Automatic role pings to both owners</li>
-                <li className="flex items-start gap-2"><span className="text-trilo-orange">✓</span> Points tracked natively in Discord</li>
-                <li className="flex items-start gap-2"><span className="text-trilo-orange">✓</span> Minutes per week, not hours</li>
+                <li className="flex items-start gap-2"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" className="mt-0.5 shrink-0"><path d="M2 6.5L5 9.5L11 3.5" stroke="#F97316" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg> Upload screenshot → channels created</li>
+                <li className="flex items-start gap-2"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" className="mt-0.5 shrink-0"><path d="M2 6.5L5 9.5L11 3.5" stroke="#F97316" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg> AI reads your schedule automatically</li>
+                <li className="flex items-start gap-2"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" className="mt-0.5 shrink-0"><path d="M2 6.5L5 9.5L11 3.5" stroke="#F97316" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg> Automatic role pings to both owners</li>
+                <li className="flex items-start gap-2"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" className="mt-0.5 shrink-0"><path d="M2 6.5L5 9.5L11 3.5" stroke="#F97316" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg> Points tracked natively in Discord</li>
+                <li className="flex items-start gap-2"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" className="mt-0.5 shrink-0"><path d="M2 6.5L5 9.5L11 3.5" stroke="#F97316" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg> Minutes per week, not hours</li>
               </ul>
             </div>
           </div>

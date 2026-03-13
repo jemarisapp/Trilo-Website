@@ -322,10 +322,12 @@ export const Pricing: React.FC = () => {
               </div>
               <div className="bg-trilo-orange/10 rounded-lg p-6 border border-trilo-orange/30">
                 <p className="text-trilo-orange font-semibold mb-3">Trilo</p>
-                <p className="text-trilo-orange text-sm mb-1.5">✅ Works on 3 servers</p>
-                <p className="text-trilo-orange text-sm mb-1.5">✅ Unlimited Madden leagues</p>
-                <p className="text-trilo-orange text-sm mb-1.5">✅ Unlimited CFB leagues</p>
-                <p className="text-trilo-orange text-sm mb-3">✅ One price covers everything</p>
+                {['Works on 3 servers','Unlimited Madden leagues','Unlimited CFB leagues','One price covers everything'].map((item, i, arr) => (
+                  <p key={item} className={`flex items-center gap-2 text-trilo-orange text-sm ${i < arr.length - 1 ? 'mb-1.5' : 'mb-3'}`}>
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" className="shrink-0"><path d="M2 6.5L5 9.5L11 3.5" stroke="#F97316" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    {item}
+                  </p>
+                ))}
                 <p className="text-gray-400 text-xs mt-4 pt-4 border-t border-trilo-orange/30">
                   Run 2 Madden + 1 CFB? <span className="text-trilo-orange font-semibold">Still $69.99/year</span>
                 </p>

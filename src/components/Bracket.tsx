@@ -83,7 +83,11 @@ const TeamPill = ({ name, seed, isWinner, isLoser, isAvailable, onClick }: TeamP
       >
         {name ?? 'TBD'}
       </span>
-      {isWinner && <span style={{ fontSize: 12, flexShrink: 0 }}>✓</span>}
+      {isWinner && (
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0 }}>
+          <path d="M2 6L5 9.5L10 2.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      )}
     </div>
   );
 };
@@ -211,32 +215,6 @@ export const Bracket = ({ seeds, picks, onPicksChange, onReset }: BracketProps) 
         </button>
       </div>
 
-      {/* Champion Banner */}
-      {champion && (
-        <div
-          style={{
-            background: championTeam ? championTeam.primary : '#F97316',
-            borderRadius: 12,
-            padding: '16px 20px',
-            marginBottom: 24,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 14,
-            boxShadow: `0 0 32px ${championTeam?.primary ?? '#F97316'}55`,
-          }}
-        >
-          <span style={{ fontSize: 28 }}>🏆</span>
-          <div>
-            <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)', marginBottom: 2 }}>
-              Your Champion
-            </div>
-            <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
-              {champion}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* FIRST ROUND */}
       <div style={{ marginBottom: 28 }}>
         <RoundHeader label="First Round" />
@@ -315,6 +293,38 @@ export const Bracket = ({ seeds, picks, onPicksChange, onReset }: BracketProps) 
           onPickBottom={() => picks.semifinal[1] && handleChampionship(picks.semifinal[1])}
         />
       </div>
+
+      {/* Champion Banner */}
+      {champion && (
+        <div
+          style={{
+            background: championTeam ? championTeam.primary : '#F97316',
+            borderRadius: 12,
+            padding: '16px 20px',
+            marginBottom: 24,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 14,
+            boxShadow: `0 0 32px ${championTeam?.primary ?? '#F97316'}55`,
+          }}
+        >
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none" style={{ flexShrink: 0 }}>
+            <path d="M9 4H21V17C21 20.314 18.314 23 15 23C11.686 23 9 20.314 9 17V4Z" stroke="rgba(255,255,255,0.9)" strokeWidth="1.6" strokeLinejoin="round" fill="rgba(255,255,255,0.15)"/>
+            <path d="M9 8H5C5 8 4 14 9 15" stroke="rgba(255,255,255,0.9)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            <path d="M21 8H25C25 8 26 14 21 15" stroke="rgba(255,255,255,0.9)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            <path d="M15 23V26.5" stroke="rgba(255,255,255,0.9)" strokeWidth="1.6" strokeLinecap="round"/>
+            <path d="M11 26.5H19" stroke="rgba(255,255,255,0.9)" strokeWidth="1.6" strokeLinecap="round"/>
+          </svg>
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)', marginBottom: 2 }}>
+              Your Champion
+            </div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
+              {champion}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Legend */}
       <div style={{ color: '#333', fontSize: 11, textAlign: 'center', letterSpacing: '0.04em' }}>

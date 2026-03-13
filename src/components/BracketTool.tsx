@@ -9,7 +9,11 @@ import {
   clearStorage,
 } from './bracketUtils';
 
-export const BracketTool = () => {
+interface BracketToolProps {
+  onScanImage?: () => void;
+}
+
+export const BracketTool = ({ onScanImage }: BracketToolProps = {}) => {
   const [phase, setPhase] = useState<Phase>('seed-picker');
   const [seeds, setSeeds] = useState<SeedAssignments>({});
   const [picks, setPicks] = useState<BracketPicks>(emptyPicks());
@@ -106,6 +110,7 @@ export const BracketTool = () => {
           seeds={seeds}
           onSeedChange={handleSeedChange}
           onLockIn={handleLockIn}
+          onScanImage={onScanImage}
         />
       ) : (
         <Bracket
