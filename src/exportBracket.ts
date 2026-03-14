@@ -619,8 +619,26 @@ export function exportBracket(
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #000; display: flex; align-items: center; justify-content: center; min-height: 100dvh; }
+    body { background: #000; display: flex; align-items: center; justify-content: center; min-height: 100dvh; overflow: hidden; }
     img { max-width: 100%; max-height: 100dvh; object-fit: contain; display: block; }
+
+    /* Portrait mobile: rotate the image 90° so it fills the screen landscape */
+    @media (orientation: portrait) {
+      body { overflow: hidden; }
+      img {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        /* Before rotation: width = viewport height, height = viewport width.
+           After rotating 90°, those swap — filling the screen. */
+        width: 100dvh;
+        height: 100dvw;
+        max-width: none;
+        max-height: none;
+        object-fit: contain;
+        transform: translate(-50%, -50%) rotate(90deg);
+      }
+    }
   </style>
 </head>
 <body>
