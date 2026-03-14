@@ -653,43 +653,20 @@ function drawPortraitBracket(
   // ── Championship ─────────────────────────────────────────────────────────
   drawMatchup(ctx, CHAMP_BX, champCY, seedOf(picks.semifinal[0], seeds), picks.semifinal[0]??null, seedOf(picks.semifinal[1], seeds), picks.semifinal[1]??null, picks.championship??null, CHAMP_BW);
 
-  // ── Champion banner ──────────────────────────────────────────────────────
-  const bannerY = ROW_CHAMP + PMH + 24;
-  const bannerH = 64;
+  // ── Predicted Champion label ─────────────────────────────────────────────
   if (picks.championship) {
-    const grad = ctx.createLinearGradient(0, bannerY, 0, bannerY + bannerH);
-    grad.addColorStop(0, 'rgba(200,160,40,0.25)');
-    grad.addColorStop(1, 'rgba(200,160,40,0.05)');
-    ctx.fillStyle = grad;
-    roundRect(ctx, 60, bannerY, PW - 120, bannerH, 8);
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(200,160,40,0.6)';
-    ctx.lineWidth = 1.5;
-    roundRect(ctx, 60, bannerY, PW - 120, bannerH, 8);
-    ctx.stroke();
-
-    // Vertically center the two lines inside bannerH (64px)
-    // Line heights: ~13px label + 6px gap + ~28px name = ~47px total → 8.5px top pad
+    const labelY = ROW_CHAMP + PMH + 32;
     ctx.fillStyle = '#F9C93E';
     ctx.font = `800 13px "Barlow Condensed", Arial Narrow, Arial, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.letterSpacing = '3px';
-    ctx.fillText('CHAMPION', PW / 2, bannerY + 15);
+    ctx.letterSpacing = '2px';
+    ctx.fillText('PREDICTED CHAMPION', PW / 2, labelY);
     ctx.letterSpacing = '0px';
 
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = `800 28px "Barlow Condensed", Arial Narrow, Arial, sans-serif`;
-    ctx.fillText(picks.championship.toUpperCase(), PW / 2, bannerY + 42);
-  } else {
-    ctx.fillStyle = 'rgba(40,40,60,0.5)';
-    roundRect(ctx, 60, bannerY, PW - 120, bannerH, 8);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.18)';
-    ctx.font = `800 18px "Barlow Condensed", Arial Narrow, Arial, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('CHAMPION TBD', PW / 2, bannerY + bannerH / 2);
+    ctx.fillStyle = '#F9C93E';
+    ctx.font = `800 42px "Barlow Condensed", Arial Narrow, Arial, sans-serif`;
+    ctx.fillText(picks.championship.toUpperCase(), PW / 2, labelY + 36);
   }
 
   return canvas;
