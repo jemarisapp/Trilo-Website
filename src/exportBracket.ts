@@ -457,6 +457,215 @@ function drawRoundLabel(
   ctx.stroke();
 }
 
+// ─── Portrait layout for mobile ───────────────────────────────────────────────
+
+function drawPortraitBracket(
+  seeds: Record<number, string>,
+  picks: {
+    firstRound: (string | null)[];
+    quarterfinal: (string | null)[];
+    semifinal: (string | null)[];
+    championship: string | null;
+  }
+): HTMLCanvasElement {
+  const PW = 1080;
+  const PH = 1100;
+  const canvas = document.createElement('canvas');
+  canvas.width = PW;
+  canvas.height = PH;
+  const ctx = canvas.getContext('2d')!;
+
+  // Reuse landscape box geometry (BH=60, MGAP=8, MH=128)
+  const PBW = 220;
+  const PMH = BH * 2 + MGAP; // 128
+
+  // 4 column centers spread evenly across PW
+  const COL_CX = [135, 405, 675, 945] as const;
+  const COL_BX = COL_CX.map(cx => cx - PBW / 2); // [25, 295, 565, 835]
+
+  // SF: midpoint of each QF column pair
+  const SF_CX = [
+    (COL_CX[0] + COL_CX[1]) / 2,  // 270
+    (COL_CX[2] + COL_CX[3]) / 2,  // 810
+  ];
+  const SF_BX = SF_CX.map(cx => cx - PBW / 2); // [160, 700]
+
+  // Championship: centered
+  const CHAMP_CX = PW / 2; // 540
+  const CHAMP_BW = 260;
+  const CHAMP_BX = CHAMP_CX - CHAMP_BW / 2; // 410
+
+  // Row start Y (top edge of each round's top team box)
+  const ROW_FR    = 120;
+  const ROW_QF    = ROW_FR + PMH + 80;    // 328
+  const ROW_SF    = ROW_QF + PMH + 80;    // 536
+  const ROW_CHAMP = ROW_SF + PMH + 80;    // 744
+
+  // Matchup center Y for each row
+  const frCY    = ROW_FR    + BH + MGAP / 2; // 184
+  const qfCY    = ROW_QF    + BH + MGAP / 2; // 392
+  const sfCY    = ROW_SF    + BH + MGAP / 2; // 600
+  const champCY = ROW_CHAMP + BH + MGAP / 2; // 808
+
+  // ── Background ──────────────────────────────────────────────────────────
+  ctx.fillStyle = '#06060e';
+  ctx.fillRect(0, 0, PW, PH);
+
+  const glow = ctx.createRadialGradient(PW * 0.5, PH * 0.45, 80, PW * 0.5, PH * 0.45, 700);
+  glow.addColorStop(0, 'rgba(180,90,10,0.12)');
+  glow.addColorStop(0.5, 'rgba(100,40,5,0.06)');
+  glow.addColorStop(1, 'transparent');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, PW, PH);
+
+  // ── Header ──────────────────────────────────────────────────────────────
+  const hdrGrad = ctx.createLinearGradient(0, 0, 0, 90);
+  hdrGrad.addColorStop(0, 'rgba(15,8,0,0.98)');
+  hdrGrad.addColorStop(1, 'transparent');
+  ctx.fillStyle = hdrGrad;
+  ctx.fillRect(0, 0, PW, 90);
+
+  ctx.fillStyle = '#F97316';
+  ctx.font = `800 38px "Barlow Condensed", Arial Narrow, Arial, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('CFP BRACKET PREDICTOR', PW / 2, 42);
+
+  ctx.fillStyle = 'rgba(249,115,22,0.4)';
+  ctx.font = `bold 13px "Barlow Condensed", Arial, sans-serif`;
+  ctx.fillText('TRILO.GG', PW / 2, 68);
+
+  // ── Connector helpers ────────────────────────────────────────────────────
+  function vertConnector(cx: number, fromY: number, toY: number, active: boolean) {
+    setConnectorStyle(ctx, active);
+    ctx.beginPath();
+    ctx.moveTo(cx, fromY);
+    ctx.lineTo(cx, toY);
+    ctx.stroke();
+  }
+
+  // Two same-row matchups fork down into one matchup below
+  function portraitFork(
+    leftX: number, rightX: number, srcY: number,
+    targetX: number, dstY: number, active: boolean
+  ) {
+    const spineY = (srcY + dstY) / 2;
+    setConnectorStyle(ctx, active);
+    ctx.beginPath();
+    ctx.moveTo(leftX, srcY);   ctx.lineTo(leftX, spineY);
+    ctx.moveTo(rightX, srcY);  ctx.lineTo(rightX, spineY);
+    ctx.moveTo(leftX, spineY); ctx.lineTo(rightX, spineY);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(targetX, spineY);
+    ctx.lineTo(targetX, dstY);
+    ctx.stroke();
+  }
+
+  // ── Connectors (drawn before boxes) ─────────────────────────────────────
+  for (let i = 0; i < 4; i++) {
+    vertConnector(COL_CX[i], ROW_FR + PMH, ROW_QF, picks.firstRound[i] != null);
+  }
+  portraitFork(COL_CX[0], COL_CX[1], ROW_QF + PMH, SF_CX[0], ROW_SF, picks.semifinal[0] != null);
+  portraitFork(COL_CX[2], COL_CX[3], ROW_QF + PMH, SF_CX[1], ROW_SF, picks.semifinal[1] != null);
+  portraitFork(SF_CX[0], SF_CX[1], ROW_SF + PMH, CHAMP_CX, ROW_CHAMP, picks.championship != null);
+
+  // ── Round labels ─────────────────────────────────────────────────────────
+  function portraitRoundLabel(label: string, rowTopY: number) {
+    const y = rowTopY - 22;
+    ctx.fillStyle = 'rgba(249,115,22,0.65)';
+    ctx.beginPath();
+    ctx.arc(28, y, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.font = `bold 11px "Barlow Condensed", Arial, sans-serif`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.letterSpacing = '2px';
+    ctx.fillText(label.toUpperCase(), 40, y);
+    ctx.letterSpacing = '0px';
+    ctx.strokeStyle = 'rgba(249,115,22,0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(20, y + 10);
+    ctx.lineTo(PW - 20, y + 10);
+    ctx.stroke();
+  }
+
+  portraitRoundLabel('First Round', ROW_FR);
+  portraitRoundLabel('Quarterfinal', ROW_QF);
+  portraitRoundLabel('Semifinal', ROW_SF);
+  portraitRoundLabel('National Championship', ROW_CHAMP);
+
+  // ── First Round ──────────────────────────────────────────────────────────
+  drawMatchup(ctx, COL_BX[0], frCY, 12, seeds[12]??null, 5,  seeds[5]??null,  picks.firstRound[0]??null, PBW);
+  drawMatchup(ctx, COL_BX[1], frCY, 9,  seeds[9]??null,  8,  seeds[8]??null,  picks.firstRound[1]??null, PBW);
+  drawMatchup(ctx, COL_BX[2], frCY, 11, seeds[11]??null, 6,  seeds[6]??null,  picks.firstRound[2]??null, PBW);
+  drawMatchup(ctx, COL_BX[3], frCY, 10, seeds[10]??null, 7,  seeds[7]??null,  picks.firstRound[3]??null, PBW);
+
+  // ── Quarterfinal ─────────────────────────────────────────────────────────
+  drawMatchup(ctx, COL_BX[0], qfCY, 4, seeds[4]??null, null, picks.firstRound[0]??null, picks.quarterfinal[0]??null, PBW);
+  drawMatchup(ctx, COL_BX[1], qfCY, 1, seeds[1]??null, null, picks.firstRound[1]??null, picks.quarterfinal[1]??null, PBW);
+  drawMatchup(ctx, COL_BX[2], qfCY, 3, seeds[3]??null, null, picks.firstRound[2]??null, picks.quarterfinal[2]??null, PBW);
+  drawMatchup(ctx, COL_BX[3], qfCY, 2, seeds[2]??null, null, picks.firstRound[3]??null, picks.quarterfinal[3]??null, PBW);
+
+  // ── Semifinal ────────────────────────────────────────────────────────────
+  drawMatchup(ctx, SF_BX[0], sfCY, null, picks.quarterfinal[0]??null, null, picks.quarterfinal[1]??null, picks.semifinal[0]??null, PBW);
+  drawMatchup(ctx, SF_BX[1], sfCY, null, picks.quarterfinal[2]??null, null, picks.quarterfinal[3]??null, picks.semifinal[1]??null, PBW);
+
+  // ── Championship ─────────────────────────────────────────────────────────
+  drawMatchup(ctx, CHAMP_BX, champCY, null, picks.semifinal[0]??null, null, picks.semifinal[1]??null, picks.championship??null, CHAMP_BW);
+
+  // ── Champion banner ──────────────────────────────────────────────────────
+  const bannerY = ROW_CHAMP + PMH + 24;
+  const bannerH = 64;
+  if (picks.championship) {
+    const grad = ctx.createLinearGradient(0, bannerY, 0, bannerY + bannerH);
+    grad.addColorStop(0, 'rgba(200,160,40,0.25)');
+    grad.addColorStop(1, 'rgba(200,160,40,0.05)');
+    ctx.fillStyle = grad;
+    roundRect(ctx, 60, bannerY, PW - 120, bannerH, 8);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(200,160,40,0.6)';
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, 60, bannerY, PW - 120, bannerH, 8);
+    ctx.stroke();
+
+    ctx.fillStyle = '#F9C93E';
+    ctx.font = `800 13px "Barlow Condensed", Arial Narrow, Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.letterSpacing = '3px';
+    ctx.fillText('CHAMPION', PW / 2, bannerY + 20);
+    ctx.letterSpacing = '0px';
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = `800 28px "Barlow Condensed", Arial Narrow, Arial, sans-serif`;
+    ctx.fillText(picks.championship.toUpperCase(), PW / 2, bannerY + 46);
+  } else {
+    ctx.fillStyle = 'rgba(40,40,60,0.5)';
+    roundRect(ctx, 60, bannerY, PW - 120, bannerH, 8);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.font = `800 18px "Barlow Condensed", Arial Narrow, Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('CHAMPION TBD', PW / 2, bannerY + bannerH / 2);
+  }
+
+  // ── Footer banner ────────────────────────────────────────────────────────
+  const footerH = 32;
+  ctx.fillStyle = '#F97316';
+  ctx.fillRect(0, PH - footerH, PW, footerH);
+  ctx.fillStyle = '#000000';
+  ctx.font = `800 14px "Barlow Condensed", Arial Narrow, Arial, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('MADE WITH TRILO · TRILO.GG', PW / 2, PH - footerH / 2);
+
+  return canvas;
+}
+
 // ─── Main export function ──────────────────────────────────────────────────────
 
 export function exportBracket(
@@ -468,6 +677,32 @@ export function exportBracket(
     championship: string | null;
   }
 ) {
+  // ── Mobile: use portrait layout ───────────────────────────────────────────
+  if (window.innerWidth < 768) {
+    const portraitCanvas = drawPortraitBracket(seeds, picks);
+    const dataUrl = portraitCanvas.toDataURL('image/jpeg', 0.93);
+    const win = window.open('', '_blank');
+    if (win) {
+      win.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <title>CFP Bracket</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #000; display: flex; align-items: center; justify-content: center; min-height: 100dvh; }
+    img { max-width: 100%; max-height: 100dvh; object-fit: contain; display: block; }
+  </style>
+</head>
+<body>
+  <img src="${dataUrl}" alt="CFP Bracket" />
+</body>
+</html>`);
+      win.document.close();
+    }
+    return;
+  }
+
   const canvas = document.createElement('canvas');
   canvas.width = W;
   canvas.height = H;
