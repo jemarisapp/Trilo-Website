@@ -287,6 +287,34 @@ function drawMatchupConnector(
   }
 }
 
+/**
+ * Extend an existing matchup spine (already drawn by drawMatchupConnector) into
+ * the next round. Draws the inter-matchup vertical at spineX then the horizontal
+ * to the next column — no redundant per-team stubs.
+ */
+function drawForkFromSpine(
+  ctx: CanvasRenderingContext2D,
+  spineX: number,    // colX + BW + STUB from the source matchups
+  topCY: number,     // center-Y of the first source matchup
+  botCY: number,     // center-Y of the second source matchup
+  toCol: number,     // left edge of target matchup box
+  targetCY: number,  // center-Y of target matchup
+  active = false
+) {
+  // Vertical spine bridging the two matchup spines
+  setConnectorStyle(ctx, active);
+  ctx.beginPath();
+  ctx.moveTo(spineX, topCY);
+  ctx.lineTo(spineX, botCY);
+  ctx.stroke();
+
+  // Horizontal from midpoint to next column
+  ctx.beginPath();
+  ctx.moveTo(spineX, targetCY);
+  ctx.lineTo(toCol, targetCY);
+  ctx.stroke();
+}
+
 // ─── Background ────────────────────────────────────────────────────────────────
 
 function drawBackground(ctx: CanvasRenderingContext2D) {
@@ -540,8 +568,8 @@ function drawPortraitBracket(
   ctx.textBaseline = 'middle';
   ctx.fillText('CFP BRACKET PREDICTOR', PW / 2, 42);
 
-  ctx.fillStyle = 'rgba(249,115,22,0.4)';
-  ctx.font = `bold 13px "Barlow Condensed", Arial, sans-serif`;
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.font = `bold 18px "Barlow Condensed", Arial, sans-serif`;
   ctx.fillText('TRILO.GG', PW / 2, 68);
 
   // ── Connector helpers ────────────────────────────────────────────────────
@@ -640,17 +668,19 @@ function drawPortraitBracket(
     roundRect(ctx, 60, bannerY, PW - 120, bannerH, 8);
     ctx.stroke();
 
+    // Vertically center the two lines inside bannerH (64px)
+    // Line heights: ~13px label + 6px gap + ~28px name = ~47px total → 8.5px top pad
     ctx.fillStyle = '#F9C93E';
     ctx.font = `800 13px "Barlow Condensed", Arial Narrow, Arial, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.letterSpacing = '3px';
-    ctx.fillText('CHAMPION', PW / 2, bannerY + 20);
+    ctx.fillText('CHAMPION', PW / 2, bannerY + 15);
     ctx.letterSpacing = '0px';
 
     ctx.fillStyle = '#FFFFFF';
     ctx.font = `800 28px "Barlow Condensed", Arial Narrow, Arial, sans-serif`;
-    ctx.fillText(picks.championship.toUpperCase(), PW / 2, bannerY + 46);
+    ctx.fillText(picks.championship.toUpperCase(), PW / 2, bannerY + 42);
   } else {
     ctx.fillStyle = 'rgba(40,40,60,0.5)';
     roundRect(ctx, 60, bannerY, PW - 120, bannerH, 8);
@@ -661,16 +691,6 @@ function drawPortraitBracket(
     ctx.textBaseline = 'middle';
     ctx.fillText('CHAMPION TBD', PW / 2, bannerY + bannerH / 2);
   }
-
-  // ── Footer banner ────────────────────────────────────────────────────────
-  const footerH = 32;
-  ctx.fillStyle = '#F97316';
-  ctx.fillRect(0, PH - footerH, PW, footerH);
-  ctx.fillStyle = '#000000';
-  ctx.font = `800 14px "Barlow Condensed", Arial Narrow, Arial, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('MADE WITH TRILO · TRILO.GG', PW / 2, PH - footerH / 2);
 
   return canvas;
 }
@@ -735,10 +755,11 @@ export function exportBracket(
   ctx.fillText('CFP BRACKET PREDICTOR', COL_FR, 44);
 
   // Watermark
-  ctx.fillStyle = 'rgba(249,115,22,0.4)';
-  ctx.font = `bold 14px "Barlow Condensed", Arial, sans-serif`;
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.font = `bold 18px "Barlow Condensed", Arial, sans-serif`;
   ctx.textAlign = 'right';
-  ctx.fillText('TRILO.GG', W - 28, 44);
+  ctx.textBaseline = 'bottom';
+  ctx.fillText('TRILO.GG', W - 28, H - 20);
 
   // If champion picked, show in header
   if (picks.championship) {
@@ -756,41 +777,21 @@ export function exportBracket(
 
   // ── Connectors (drawn before boxes so boxes sit on top) ───────────────────
 
+  // Per-matchup internal connectors (stubs from each team box → spine)
   for (let i = 0; i < 4; i++) {
-    const frC = frCenterY(i);
-    const qfC = qfCenterY(i);
-    const frHasWinner = picks.firstRound[i] != null;
-
-    // FR internal matchup connector → right stub to QF
-    drawMatchupConnector(ctx, COL_FR, frC, COL_QF, frHasWinner);
-
-    const qfHasWinner = picks.quarterfinal[i] != null;
-    // QF internal L-shape only — drawForkConnector handles QF→SF
-    drawMatchupConnector(ctx, COL_QF, qfC, null, qfHasWinner);
+    drawMatchupConnector(ctx, COL_FR, frCenterY(i), COL_QF, picks.firstRound[i] != null);
+    drawMatchupConnector(ctx, COL_QF, qfCenterY(i), null,   picks.quarterfinal[i] != null);
   }
+  drawMatchupConnector(ctx, COL_SF, sfCenterY(0), null, picks.semifinal[0] != null);
+  drawMatchupConnector(ctx, COL_SF, sfCenterY(1), null, picks.semifinal[1] != null);
 
-  // QF[0]+QF[1] → SF[0]
-  drawForkConnector(
-    ctx,
-    COL_QF + BW, qfCenterY(0), qfCenterY(1),
-    COL_SF, sfCenterY(0),
-    picks.semifinal[0] != null
-  );
-  // QF[2]+QF[3] → SF[1]
-  drawForkConnector(
-    ctx,
-    COL_QF + BW, qfCenterY(2), qfCenterY(3),
-    COL_SF, sfCenterY(1),
-    picks.semifinal[1] != null
-  );
+  // Fork connectors — bridge spines between matchup pairs into the next round
+  const QF_SPINE = COL_QF + BW + STUB;
+  const SF_SPINE = COL_SF + BW + STUB;
 
-  // SF[0]+SF[1] → Championship
-  drawForkConnector(
-    ctx,
-    COL_SF + BW, sfCenterY(0), sfCenterY(1),
-    COL_CHAMP, champCenterY(),
-    picks.championship != null
-  );
+  drawForkFromSpine(ctx, QF_SPINE, qfCenterY(0), qfCenterY(1), COL_SF,   sfCenterY(0),   picks.semifinal[0]    != null);
+  drawForkFromSpine(ctx, QF_SPINE, qfCenterY(2), qfCenterY(3), COL_SF,   sfCenterY(1),   picks.semifinal[1]    != null);
+  drawForkFromSpine(ctx, SF_SPINE, sfCenterY(0), sfCenterY(1), COL_CHAMP, champCenterY(), picks.championship   != null);
 
   // ── First Round matchups ──────────────────────────────────────────────────
   // FR[0]: 12 vs 5
@@ -841,16 +842,6 @@ export function exportBracket(
   // ── Trophy ────────────────────────────────────────────────────────────────
   const trophyX = COL_CHAMP + champW + 60;
   drawTrophy(ctx, trophyX, champCenterY(), picks.championship ?? null);
-
-  // ── Footer banner ─────────────────────────────────────────────────────────
-  const footerH = 32;
-  ctx.fillStyle = '#F97316';
-  ctx.fillRect(0, H - footerH, W, footerH);
-  ctx.fillStyle = '#000000';
-  ctx.font = `800 14px "Barlow Condensed", Arial Narrow, Arial, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('MADE WITH TRILO · TRILO.GG', W / 2, H - footerH / 2);
 
   // ── Open in new tab ───────────────────────────────────────────────────────
   const dataUrl = canvas.toDataURL('image/jpeg', 0.93);
