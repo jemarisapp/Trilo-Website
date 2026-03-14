@@ -457,6 +457,15 @@ function drawRoundLabel(
   ctx.stroke();
 }
 
+// ─── Seed lookup helper ────────────────────────────────────────────────────────
+
+/** Given a team name, find which seed number it was assigned */
+function seedOf(name: string | null, seeds: Record<number, string>): number | null {
+  if (!name) return null;
+  const entry = Object.entries(seeds).find(([, n]) => n === name);
+  return entry ? Number(entry[0]) : null;
+}
+
 // ─── Portrait layout for mobile ───────────────────────────────────────────────
 
 function drawPortraitBracket(
@@ -604,17 +613,17 @@ function drawPortraitBracket(
   drawMatchup(ctx, COL_BX[3], frCY, 10, seeds[10]??null, 7,  seeds[7]??null,  picks.firstRound[3]??null, PBW);
 
   // ── Quarterfinal ─────────────────────────────────────────────────────────
-  drawMatchup(ctx, COL_BX[0], qfCY, 4, seeds[4]??null, null, picks.firstRound[0]??null, picks.quarterfinal[0]??null, PBW);
-  drawMatchup(ctx, COL_BX[1], qfCY, 1, seeds[1]??null, null, picks.firstRound[1]??null, picks.quarterfinal[1]??null, PBW);
-  drawMatchup(ctx, COL_BX[2], qfCY, 3, seeds[3]??null, null, picks.firstRound[2]??null, picks.quarterfinal[2]??null, PBW);
-  drawMatchup(ctx, COL_BX[3], qfCY, 2, seeds[2]??null, null, picks.firstRound[3]??null, picks.quarterfinal[3]??null, PBW);
+  drawMatchup(ctx, COL_BX[0], qfCY, 4, seeds[4]??null, seedOf(picks.firstRound[0], seeds), picks.firstRound[0]??null, picks.quarterfinal[0]??null, PBW);
+  drawMatchup(ctx, COL_BX[1], qfCY, 1, seeds[1]??null, seedOf(picks.firstRound[1], seeds), picks.firstRound[1]??null, picks.quarterfinal[1]??null, PBW);
+  drawMatchup(ctx, COL_BX[2], qfCY, 3, seeds[3]??null, seedOf(picks.firstRound[2], seeds), picks.firstRound[2]??null, picks.quarterfinal[2]??null, PBW);
+  drawMatchup(ctx, COL_BX[3], qfCY, 2, seeds[2]??null, seedOf(picks.firstRound[3], seeds), picks.firstRound[3]??null, picks.quarterfinal[3]??null, PBW);
 
   // ── Semifinal ────────────────────────────────────────────────────────────
-  drawMatchup(ctx, SF_BX[0], sfCY, null, picks.quarterfinal[0]??null, null, picks.quarterfinal[1]??null, picks.semifinal[0]??null, PBW);
-  drawMatchup(ctx, SF_BX[1], sfCY, null, picks.quarterfinal[2]??null, null, picks.quarterfinal[3]??null, picks.semifinal[1]??null, PBW);
+  drawMatchup(ctx, SF_BX[0], sfCY, seedOf(picks.quarterfinal[0], seeds), picks.quarterfinal[0]??null, seedOf(picks.quarterfinal[1], seeds), picks.quarterfinal[1]??null, picks.semifinal[0]??null, PBW);
+  drawMatchup(ctx, SF_BX[1], sfCY, seedOf(picks.quarterfinal[2], seeds), picks.quarterfinal[2]??null, seedOf(picks.quarterfinal[3], seeds), picks.quarterfinal[3]??null, picks.semifinal[1]??null, PBW);
 
   // ── Championship ─────────────────────────────────────────────────────────
-  drawMatchup(ctx, CHAMP_BX, champCY, null, picks.semifinal[0]??null, null, picks.semifinal[1]??null, picks.championship??null, CHAMP_BW);
+  drawMatchup(ctx, CHAMP_BX, champCY, seedOf(picks.semifinal[0], seeds), picks.semifinal[0]??null, seedOf(picks.semifinal[1], seeds), picks.semifinal[1]??null, picks.championship??null, CHAMP_BW);
 
   // ── Champion banner ──────────────────────────────────────────────────────
   const bannerY = ROW_CHAMP + PMH + 24;
@@ -800,32 +809,32 @@ export function exportBracket(
   // ── Quarterfinal matchups ─────────────────────────────────────────────────
   // QF[0]: seed 4 (bye) vs FR[0] winner
   drawMatchup(ctx, COL_QF, qfCenterY(0),
-    4, seeds[4] ?? null, null, picks.firstRound[0] ?? null, picks.quarterfinal[0] ?? null);
+    4, seeds[4] ?? null, seedOf(picks.firstRound[0], seeds), picks.firstRound[0] ?? null, picks.quarterfinal[0] ?? null);
   // QF[1]: seed 1 (bye) vs FR[1] winner
   drawMatchup(ctx, COL_QF, qfCenterY(1),
-    1, seeds[1] ?? null, null, picks.firstRound[1] ?? null, picks.quarterfinal[1] ?? null);
+    1, seeds[1] ?? null, seedOf(picks.firstRound[1], seeds), picks.firstRound[1] ?? null, picks.quarterfinal[1] ?? null);
   // QF[2]: seed 3 (bye) vs FR[2] winner
   drawMatchup(ctx, COL_QF, qfCenterY(2),
-    3, seeds[3] ?? null, null, picks.firstRound[2] ?? null, picks.quarterfinal[2] ?? null);
+    3, seeds[3] ?? null, seedOf(picks.firstRound[2], seeds), picks.firstRound[2] ?? null, picks.quarterfinal[2] ?? null);
   // QF[3]: seed 2 (bye) vs FR[3] winner
   drawMatchup(ctx, COL_QF, qfCenterY(3),
-    2, seeds[2] ?? null, null, picks.firstRound[3] ?? null, picks.quarterfinal[3] ?? null);
+    2, seeds[2] ?? null, seedOf(picks.firstRound[3], seeds), picks.firstRound[3] ?? null, picks.quarterfinal[3] ?? null);
 
   // ── Semifinal matchups ────────────────────────────────────────────────────
   drawMatchup(ctx, COL_SF, sfCenterY(0),
-    null, picks.quarterfinal[0] ?? null,
-    null, picks.quarterfinal[1] ?? null,
+    seedOf(picks.quarterfinal[0], seeds), picks.quarterfinal[0] ?? null,
+    seedOf(picks.quarterfinal[1], seeds), picks.quarterfinal[1] ?? null,
     picks.semifinal[0] ?? null);
   drawMatchup(ctx, COL_SF, sfCenterY(1),
-    null, picks.quarterfinal[2] ?? null,
-    null, picks.quarterfinal[3] ?? null,
+    seedOf(picks.quarterfinal[2], seeds), picks.quarterfinal[2] ?? null,
+    seedOf(picks.quarterfinal[3], seeds), picks.quarterfinal[3] ?? null,
     picks.semifinal[1] ?? null);
 
   // ── Championship matchup ──────────────────────────────────────────────────
   const champW = BW + 24;
   drawMatchup(ctx, COL_CHAMP, champCenterY(),
-    null, picks.semifinal[0] ?? null,
-    null, picks.semifinal[1] ?? null,
+    seedOf(picks.semifinal[0], seeds), picks.semifinal[0] ?? null,
+    seedOf(picks.semifinal[1], seeds), picks.semifinal[1] ?? null,
     picks.championship ?? null,
     champW);
 
