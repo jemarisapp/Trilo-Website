@@ -533,10 +533,10 @@ function drawPortraitBracket(
   const CHAMP_BX = CHAMP_CX - CHAMP_BW / 2; // 410
 
   // Row start Y (top edge of each round's top team box)
-  const ROW_FR    = 120;
-  const ROW_QF    = ROW_FR + PMH + 80;    // 328
-  const ROW_SF    = ROW_QF + PMH + 80;    // 536
-  const ROW_CHAMP = ROW_SF + PMH + 80;    // 744
+  const ROW_FR    = 170;
+  const ROW_QF    = ROW_FR + PMH + 80;
+  const ROW_SF    = ROW_QF + PMH + 80;
+  const ROW_CHAMP = ROW_SF + PMH + 80;
 
   // Matchup center Y for each row
   const frCY    = ROW_FR    + BH + MGAP / 2; // 184
@@ -556,21 +556,21 @@ function drawPortraitBracket(
   ctx.fillRect(0, 0, PW, PH);
 
   // ── Header ──────────────────────────────────────────────────────────────
-  const hdrGrad = ctx.createLinearGradient(0, 0, 0, 90);
+  const hdrGrad = ctx.createLinearGradient(0, 0, 0, 140);
   hdrGrad.addColorStop(0, 'rgba(15,8,0,0.98)');
   hdrGrad.addColorStop(1, 'transparent');
   ctx.fillStyle = hdrGrad;
-  ctx.fillRect(0, 0, PW, 90);
+  ctx.fillRect(0, 0, PW, 140);
 
   ctx.fillStyle = '#F97316';
   ctx.font = `800 38px "Barlow Condensed", Arial Narrow, Arial, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('CFP BRACKET PREDICTOR', PW / 2, 42);
+  ctx.fillText('CFP BRACKET PREDICTOR', PW / 2, 68);
 
   ctx.fillStyle = 'rgba(255,255,255,0.7)';
   ctx.font = `bold 18px "Barlow Condensed", Arial, sans-serif`;
-  ctx.fillText('TRILO.GG', PW / 2, 68);
+  ctx.fillText('TRILO.GG', PW / 2, 100);
 
   // ── Connector helpers ────────────────────────────────────────────────────
   function vertConnector(cx: number, fromY: number, toY: number, active: boolean) {
