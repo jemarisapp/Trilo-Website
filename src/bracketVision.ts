@@ -2,12 +2,11 @@ import { SeedAssignments } from './components/bracket.types';
 import { TEAM_NAMES } from './components/teams';
 
 /**
- * Sends a bracket image to GPT-4o-mini vision API and returns parsed seed assignments.
- * Requires a valid OpenAI API key (set VITE_OPENAI_API_KEY in .env).
+ * Sends a bracket image to the server-side /api/openai route, which calls
+ * GPT-4o-mini vision. No API key is used in the browser.
  */
 export async function parseBracketImage(
-  file: File,
-  apiKey: string
+  file: File
 ): Promise<SeedAssignments> {
   const base64 = await fileToBase64(file);
   const mimeType = file.type || 'image/jpeg';
@@ -42,42 +41,17 @@ Example response format:
 
 Return only the JSON object. No explanation, no markdown, no code block.`;
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await fetch('/api/openai', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:${mimeType};base64,${base64}`,
-                detail: 'high',
-              },
-            },
-            {
-              type: 'text',
-              text: prompt,
-            },
-          ],
-        },
-      ],
-      max_tokens: 600,
-      temperature: 0,
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ imageBase64: base64, mimeType, prompt }),
   });
 
   if (!response.ok) {
-    let message = `OpenAI API error (${response.status})`;
+    let message = `Server error (${response.status})`;
     try {
       const err = await response.json();
-      if (err?.error?.message) message = err.error.message;
+      if (err?.error) message = err.error;
     } catch {
       // ignore parse error
     }
@@ -85,7 +59,7 @@ Return only the JSON object. No explanation, no markdown, no code block.`;
   }
 
   const data = await response.json();
-  const content: string = data.choices?.[0]?.message?.content ?? '';
+  const content: string = data.content ?? '';
 
   // Strip markdown code fences if present
   const jsonMatch = content.match(/\{[\s\S]*\}/);

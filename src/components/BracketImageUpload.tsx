@@ -10,9 +10,6 @@ interface BracketImageUploadProps {
 
 type UploadState = 'idle' | 'loading' | 'done' | 'error';
 
-const API_KEY = (import.meta as unknown as { env: Record<string, string> }).env
-  .VITE_OPENAI_API_KEY as string | undefined;
-
 const FONT = "'Barlow Condensed', 'Arial Narrow', Arial, sans-serif";
 
 export const BracketImageUpload = ({ onSeedsDetected, onClose }: BracketImageUploadProps) => {
@@ -31,14 +28,6 @@ export const BracketImageUpload = ({ onSeedsDetected, onClose }: BracketImageUpl
       return;
     }
 
-    if (!API_KEY) {
-      setErrorMsg(
-        'No API key found. Create a .env file in the project root with:\nVITE_OPENAI_API_KEY=your-key-here\nThen restart the dev server.'
-      );
-      setState('error');
-      return;
-    }
-
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
     setState('loading');
@@ -46,7 +35,7 @@ export const BracketImageUpload = ({ onSeedsDetected, onClose }: BracketImageUpl
     setErrorMsg('');
 
     try {
-      const seeds = await parseBracketImage(file, API_KEY);
+      const seeds = await parseBracketImage(file);
       setDetectedSeeds(seeds);
       setState('done');
     } catch (err: unknown) {
