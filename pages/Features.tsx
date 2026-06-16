@@ -234,10 +234,10 @@ export const Features: React.FC = () => {
           className="text-center mb-20"
         >
           <div className="inline-flex items-center gap-2 bg-trilo-orange/10 border border-trilo-orange/20 px-4 py-2 rounded-full mb-6">
-            <span className="text-trilo-orange text-sm font-semibold">Starting at $5.83/month</span>
+            <span className="text-trilo-orange text-sm font-semibold">Starting at $4.99/month</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-heading font-bold text-white mb-4">Same price as the game.</h2>
-          <p className="text-gray-400 max-w-xl mx-auto mb-8">One annual license covers your entire year. Works on up to 3 servers.</p>
+          <h2 className="text-3xl md:text-4xl font-heading font-bold text-white mb-4">Less than the game. More useful every week.</h2>
+          <p className="text-gray-400 max-w-xl mx-auto mb-8">Choose monthly or annual access. Every license activates one server.</p>
           <Button size="lg" onClick={() => navigate('/pricing')}>
             View Pricing <ChevronRight className="ml-1" size={20} />
           </Button>

@@ -72,7 +72,7 @@ const TeamPill = ({ name, seed, isWinner, isLoser, isAvailable, isChampionship, 
         cursor: isAvailable && name ? 'pointer' : 'default',
         transition: 'all 0.15s ease-out',
         opacity: isLoser ? 0.55 : 1,
-        height: 40,
+        height: 48,
         overflow: 'hidden',
         userSelect: 'none',
         boxShadow: goldGlow,
@@ -93,12 +93,12 @@ const TeamPill = ({ name, seed, isWinner, isLoser, isAvailable, isChampionship, 
       {/* Seed block */}
       {seed !== undefined && (
         <div style={{
-          width: 30,
+          width: 36,
           background: seedBg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: 700,
           color: seedColor,
           borderRight: `1px solid ${isWinner ? 'rgba(0,0,0,0.12)' : '#1E2025'}`,
@@ -112,7 +112,7 @@ const TeamPill = ({ name, seed, isWinner, isLoser, isAvailable, isChampionship, 
       {/* Name + checkmark */}
       <div style={{ flex: 1, padding: '0 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', overflow: 'hidden', gap: 6 }}>
         <span style={{
-          fontSize: isChampWinner && window.innerWidth < 640 ? 16 : 13,
+          fontSize: isChampWinner && window.innerWidth < 640 ? 18 : 15,
           fontWeight: isChampWinner ? 700 : 600,
           color: textColor,
           fontFamily: 'system-ui, -apple-system, sans-serif',
@@ -217,9 +217,7 @@ export const Bracket = ({ seeds, picks, onPicksChange }: BracketProps) => {
       display: 'flex',
       alignItems: 'flex-start',
       gap: 20,
-      padding: '20px 16px',
-      maxWidth: 1440,
-      margin: '0 auto',
+      padding: '20px 24px',
       flexWrap: 'wrap',
     }}>
 
@@ -230,14 +228,14 @@ export const Bracket = ({ seeds, picks, onPicksChange }: BracketProps) => {
         flex: '1 1 600px',
         minWidth: 0,
         display: 'flex',
-        gap: 16,
+        gap: 20,
         overflowX: 'auto',
         overflowY: 'visible',
         paddingBottom: 16,
       }}>
 
         {/* FIRST ROUND */}
-        <div style={{ width: 240, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ flex: 1, minWidth: 220, display: 'flex', flexDirection: 'column', gap: 14 }}>
           <RoundHeader label="First Round" />
           {FIRST_ROUND_MATCHUPS.map(([topSeed, bottomSeed], i) => (
             <MatchupCard key={i}
@@ -251,7 +249,7 @@ export const Bracket = ({ seeds, picks, onPicksChange }: BracketProps) => {
         </div>
 
         {/* QUARTERFINAL */}
-        <div style={{ width: 240, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ flex: 1, minWidth: 220, display: 'flex', flexDirection: 'column', gap: 14 }}>
           <RoundHeader label="Quarterfinal" />
           {QUARTERFINAL_BYES.map((byeSeed, i) => {
             const byeTeam  = seeds[byeSeed] ?? null;
@@ -269,7 +267,7 @@ export const Bracket = ({ seeds, picks, onPicksChange }: BracketProps) => {
         </div>
 
         {/* SEMIFINAL */}
-        <div style={{ width: 240, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ flex: 1, minWidth: 220, display: 'flex', flexDirection: 'column', gap: 14 }}>
           <RoundHeader label="Semifinal" />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 48 }}>
             {SEMIFINAL_MATCHUPS.map(([a, b], i) => {
@@ -289,7 +287,7 @@ export const Bracket = ({ seeds, picks, onPicksChange }: BracketProps) => {
         </div>
 
         {/* CHAMPIONSHIP */}
-        <div style={{ width: 240, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ flex: 1, minWidth: 220, display: 'flex', flexDirection: 'column', gap: 14 }}>
           <RoundHeader label="National Championship" accent />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <MatchupCard

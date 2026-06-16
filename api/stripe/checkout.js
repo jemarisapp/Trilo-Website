@@ -15,13 +15,33 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { priceId, discordUserId, discordUsername, discordEmail } = req.body;
+  const { plan, priceId, discordUserId, discordUsername, discordEmail } = req.body;
 
-  console.log('Received priceId:', priceId);
+  const plans = {
+    monthly: {
+      priceId: process.env.STRIPE_PRICE_ID_MONTHLY || process.env.VITE_STRIPE_PRICE_ID_MONTHLY,
+      mode: 'subscription',
+    },
+    annual: {
+      priceId: process.env.STRIPE_PRICE_ID_ANNUAL || process.env.VITE_STRIPE_PRICE_ID_ANNUAL,
+      mode: 'subscription',
+    },
+  };
+
+  const selectedPlan = plans[plan] || null;
+  const resolvedPriceId = selectedPlan?.priceId || priceId;
+  const checkoutMode = selectedPlan?.mode || 'subscription';
+
+  console.log('Received plan:', plan);
+  console.log('Resolved checkout mode:', checkoutMode);
   console.log('Discord user:', discordUserId, discordUsername);
 
-  if (!priceId) {
-    return res.status(400).json({ error: 'Missing required field: priceId' });
+  if (plan && !selectedPlan) {
+    return res.status(400).json({ error: 'Unsupported plan.' });
+  }
+
+  if (!resolvedPriceId) {
+    return res.status(400).json({ error: 'Missing Stripe price configuration for this plan.' });
   }
 
   if (!process.env.STRIPE_SECRET_KEY) {
@@ -58,18 +78,20 @@ export default async function handler(req, res) {
     const siteUrl = process.env.VITE_SITE_URL || 'https://trilo.gg';
 
     const sessionConfig = {
-      mode: 'subscription',
+      mode: checkoutMode,
       payment_method_types: ['card'],
       line_items: [
         {
-          price: priceId,
+          price: resolvedPriceId,
           quantity: 1,
         },
       ],
       success_url: `${siteUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/pricing`,
       allow_promotion_codes: true,
-      metadata: {},
+      metadata: {
+        plan: plan || 'legacy',
+      },
     };
 
     // Add customer if we have one

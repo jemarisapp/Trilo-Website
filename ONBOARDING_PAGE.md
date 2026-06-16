@@ -69,7 +69,7 @@ Notes:
 
 - the purchase flow is live
 - license keys are delivered after purchase
-- one license supports multiple Discord servers
+- one license activates one Discord server
 
 ### 3. Essential Configuration
 

@@ -137,13 +137,13 @@ export default function Success() {
                 </button>
               </div>
               <p className="text-gray-300 text-sm mb-2">
-                Your license key has also been sent to your Discord DM and email.
+                Your license key has also been sent to your Discord DM when Discord delivery is available.
               </p>
             </>
           )}
 
           <p className="text-trilo-orange text-sm font-semibold">
-            ✨ One license works on up to 3 Discord servers
+            ✨ One license activates one Discord server
           </p>
         </div>
 
@@ -161,7 +161,7 @@ export default function Success() {
               <div>
                 <h3 className="font-semibold text-lg mb-1">Check Your Email</h3>
                 <p className="text-gray-400 text-sm">
-                  Your license key has been sent to the email you used at checkout. Check your inbox (and spam folder).
+                  Stripe sends your payment receipt to the email you used at checkout.
                 </p>
               </div>
             </div>
@@ -195,9 +195,9 @@ export default function Success() {
                 💡
               </div>
               <div>
-                <h3 className="font-semibold text-lg mb-1">Use on Multiple Servers</h3>
+                <h3 className="font-semibold text-lg mb-1">Moving Servers Later</h3>
                 <p className="text-gray-400 text-sm">
-                  Your license works on up to 3 servers. Just run <code className="bg-white/10 px-2 py-1 rounded">/admin activate</code> in any other server to use it there too!
+                  Need to move Trilo? Run <code className="bg-white/10 px-2 py-1 rounded">/admin deactivate</code> in the old server, then activate the license in the new one.
                 </p>
               </div>
             </div>
@@ -207,7 +207,7 @@ export default function Success() {
         {/* Receipt Notice */}
         <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-6 mb-8">
           <p className="text-blue-200 text-sm text-center">
-            📧 A receipt and your license key have been sent to your email. You can check your activation status anytime with <code className="bg-white/10 px-2 py-1 rounded">/admin license-info</code>.
+            A receipt has been sent to your email. You can check your activation status anytime with <code className="bg-white/10 px-2 py-1 rounded">/admin license-info</code>.
           </p>
         </div>
 

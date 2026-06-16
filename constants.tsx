@@ -71,7 +71,7 @@ export const SETUP_GUIDE: SetupSection[] = [
           </>
         ),
         button: { label: "View Pricing", url: "https://trilo.gg/pricing" },
-        notes: "After purchase, you'll receive a license key via Discord DM. One license works on up to 3 servers."
+        notes: "After purchase, you'll receive a license key via Discord DM. One license activates one server."
       },
       {
         id: "2.3",
@@ -83,7 +83,7 @@ export const SETUP_GUIDE: SetupSection[] = [
         id: "2.4",
         title: "Verify activation",
         command: "/admin license-info",
-        notes: "View your license status, expiration date, and activation slots."
+        notes: "View your license status, expiration date, and activated server."
       }
     ]
   },

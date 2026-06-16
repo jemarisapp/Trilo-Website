@@ -60,29 +60,53 @@ export default async function handler(req, res) {
   // Handle the event
   console.log(`Received Webhook Event: ${event.type}`);
 
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
-
-    // We only care about subscriptions
-    if (session.mode === 'subscription') {
-      try {
-        await handleSubscriptionFulfillment(session);
-      } catch (err) {
-        console.error('Error handling subscription fulfillment:', err);
-        // Do not return 500, or Stripe will retry indefinitely
+  try {
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object;
+      if (session.mode === 'subscription') {
+        await handleCheckoutFulfillment(session);
       }
+    } else if (event.type === 'customer.subscription.updated') {
+      await handleSubscriptionUpdated(event.data.object);
+    } else if (event.type === 'customer.subscription.deleted') {
+      await handleSubscriptionDeleted(event.data.object);
     }
+  } catch (err) {
+    console.error(`Error handling ${event.type}:`, err);
+    // Do not return 500, or Stripe will retry indefinitely.
   }
 
   res.status(200).send();
 }
 
-async function handleSubscriptionFulfillment(session) {
+async function handleCheckoutFulfillment(session) {
   const customerId = session.customer;
-  const subscriptionId = session.subscription;
+  const subscriptionId = session.subscription || null;
   const discordUserId = session.metadata?.discord_user_id || session.client_reference_id;
+  const plan = session.metadata?.plan || 'monthly';
 
-  console.log(`Processing subscription for Customer: ${customerId}, User: ${discordUserId}`);
+  console.log(`Processing ${plan} checkout for Customer: ${customerId}, User: ${discordUserId}`);
+
+  let billingInterval = 'month';
+  let subscriptionStatus = 'active';
+  let currentPeriodStart = null;
+  let currentPeriodEnd = null;
+  let stripeProductId = null;
+
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+    expand: ['items.data.price'],
+  });
+
+  const price = subscription.items.data[0]?.price;
+  billingInterval = price?.recurring?.interval || billingInterval;
+  subscriptionStatus = subscription.status;
+  currentPeriodStart = subscription.current_period_start
+    ? new Date(subscription.current_period_start * 1000)
+    : null;
+  currentPeriodEnd = subscription.current_period_end
+    ? new Date(subscription.current_period_end * 1000)
+    : null;
+  stripeProductId = typeof price?.product === 'string' ? price.product : price?.product?.id || null;
 
   // 1. Generate License Key
   const licenseKey = generateLicenseKey();
@@ -92,31 +116,35 @@ async function handleSubscriptionFulfillment(session) {
   await stripe.customers.update(customerId, {
     metadata: {
       license_key: licenseKey,
-      discord_user_id: discordUserId || ''
+      discord_user_id: discordUserId || '',
+      trilo_plan: plan
     }
   });
 
   // 3. Insert into Supabase (Pending Activation)
   const now = new Date();
-  const endDate = new Date();
-  endDate.setDate(endDate.getDate() + 30); // Default to monthly
+
+  const pendingRecord = {
+    guild_id: `PENDING_${licenseKey}`,
+    license_key: licenseKey,
+    owner_user_id: discordUserId,
+    subscription_status: subscriptionStatus,
+    subscription_end_date: currentPeriodEnd?.toISOString(),
+    plan_type: 'trilo',
+    billing_interval: billingInterval,
+    current_period_start: currentPeriodStart?.toISOString(),
+    current_period_end: currentPeriodEnd?.toISOString(),
+    stripe_customer_id: customerId,
+    stripe_subscription_id: subscriptionId,
+    stripe_product_id: stripeProductId,
+    created_at: now.toISOString(),
+    updated_at: now.toISOString(),
+    activation_slot: 0
+  };
 
   const { error: dbError } = await supabase
     .from('server_subscriptions')
-    .insert([
-      {
-        guild_id: `PENDING_${licenseKey}`,
-        license_key: licenseKey,
-        owner_user_id: discordUserId,
-        subscription_status: 'active',
-        plan_type: 'trilo',
-        stripe_customer_id: customerId,
-        stripe_subscription_id: subscriptionId,
-        created_at: now.toISOString(),
-        updated_at: now.toISOString(),
-        activation_slot: 0
-      }
-    ]);
+    .insert([pendingRecord]);
 
   if (dbError) {
     console.error('Supabase Insert Error:', dbError);
@@ -135,10 +163,50 @@ async function handleSubscriptionFulfillment(session) {
 1. Go to your Discord server
 2. Run command: \`/admin activate ${licenseKey}\`
 
-Your license works on up to 3 Discord servers!
+Your license activates one Discord server.
 
 Need help? Contact @trillsapp.
     `;
     await sendDiscordDM(discordUserId, dmMessage);
+  }
+}
+
+async function handleSubscriptionUpdated(subscription) {
+  const status = subscription.status;
+  const subscriptionId = subscription.id;
+  const currentPeriodStart = subscription.current_period_start
+    ? new Date(subscription.current_period_start * 1000).toISOString()
+    : null;
+  const currentPeriodEnd = subscription.current_period_end
+    ? new Date(subscription.current_period_end * 1000).toISOString()
+    : null;
+
+  const { error } = await supabase
+    .from('server_subscriptions')
+    .update({
+      subscription_status: status,
+      subscription_end_date: currentPeriodEnd,
+      current_period_start: currentPeriodStart,
+      current_period_end: currentPeriodEnd,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('stripe_subscription_id', subscriptionId);
+
+  if (error) {
+    console.error('Supabase subscription update error:', error);
+  }
+}
+
+async function handleSubscriptionDeleted(subscription) {
+  const { error } = await supabase
+    .from('server_subscriptions')
+    .update({
+      subscription_status: 'inactive',
+      updated_at: new Date().toISOString(),
+    })
+    .eq('stripe_subscription_id', subscription.id);
+
+  if (error) {
+    console.error('Supabase subscription delete error:', error);
   }
 }

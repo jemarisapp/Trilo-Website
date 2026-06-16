@@ -63,9 +63,9 @@ export const TeamSearchInput = ({
         style={{
           display: 'flex',
           alignItems: 'center',
-          background: '#1a1a1a',
-          border: `1px solid ${selectedTeam ? selectedTeam.primary : '#333'}`,
-          borderRadius: 8,
+          background: '#111214',
+          border: `1px solid ${selectedTeam ? selectedTeam.primary + '80' : '#1E2025'}`,
+          borderRadius: 6,
           overflow: 'hidden',
           transition: 'border-color 0.2s',
         }}
@@ -94,8 +94,8 @@ export const TeamSearchInput = ({
             background: 'transparent',
             border: 'none',
             outline: 'none',
-            color: '#fff',
-            fontSize: 13,
+            color: '#C8CDD6',
+            fontSize: 14,
             padding: '8px 10px',
             fontFamily: 'inherit',
           }}
@@ -125,9 +125,9 @@ export const TeamSearchInput = ({
             top: 'calc(100% + 4px)',
             left: 0,
             right: 0,
-            background: '#1a1a1a',
-            border: '1px solid #333',
-            borderRadius: 8,
+            background: '#111214',
+            border: '1px solid #1E2025',
+            borderRadius: 6,
             maxHeight: 200,
             overflowY: 'auto',
             zIndex: 100,
@@ -146,12 +146,12 @@ export const TeamSearchInput = ({
                   gap: 8,
                   padding: '8px 12px',
                   cursor: 'pointer',
-                  color: '#fff',
-                  fontSize: 13,
+                  color: '#C8CDD6',
+                  fontSize: 14,
                   transition: 'background 0.1s',
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.background = '#2a2a2a';
+                  (e.currentTarget as HTMLDivElement).style.background = '#1a1c20';
                 }}
                 onMouseLeave={(e) => {
                   (e.currentTarget as HTMLDivElement).style.background = 'transparent';
