@@ -83,6 +83,27 @@ Common variables used by the site and API handlers:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SUPABASE_ANON_KEY`
 
+## Stripe Reset Checklist
+
+When recreating Stripe billing for the current subscription model:
+
+1. Create one Stripe product for Trilo.
+2. Add two recurring prices:
+   - Monthly: `$4.99`, recurring monthly
+   - Annual: `$39`, recurring yearly
+3. Set the resulting price IDs in Vercel/local env:
+   - `STRIPE_PRICE_ID_MONTHLY`
+   - `STRIPE_PRICE_ID_ANNUAL`
+   - `VITE_STRIPE_PRICE_ID_MONTHLY`
+   - `VITE_STRIPE_PRICE_ID_ANNUAL`
+4. Create a webhook endpoint pointed at `https://trilo.gg/api/stripe/webhook`.
+5. Subscribe the webhook to:
+   - `checkout.session.completed`
+   - `customer.subscription.updated`
+   - `customer.subscription.deleted`
+6. Set `STRIPE_WEBHOOK_SECRET` to the webhook signing secret.
+7. Run a test checkout and confirm Supabase gets rows in `licenses` and `subscriptions`.
+
 ## Project Structure
 
 ```text

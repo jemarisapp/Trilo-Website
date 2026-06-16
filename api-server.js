@@ -400,39 +400,65 @@ async function handleSubscriptionFulfillment(session) {
     }
   });
 
-  // 3. Insert into Supabase (Pending Activation)
-  // We use a placeholder guild_id because the user hasn't activated it on a server yet.
-  // The validation logic checks for LICENSE_KEY existence in the DB.
+  // 3. Insert into Supabase normalized licensing tables.
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+    expand: ['items.data.price'],
+  });
+  const price = subscription.items.data[0]?.price;
+  const currentPeriodStart = subscription.current_period_start
+    ? new Date(subscription.current_period_start * 1000)
+    : null;
+  const currentPeriodEnd = subscription.current_period_end
+    ? new Date(subscription.current_period_end * 1000)
+    : null;
+  const stripeProductId = typeof price?.product === 'string'
+    ? price.product
+    : price?.product?.id || null;
 
-  // Calculate end date (default to 30 days if not available, though subscription object has it)
-  // Ideally we fetch subscription details, but for now we set a safe default or 'active' status.
-  const now = new Date();
-  const endDate = new Date();
-  endDate.setDate(endDate.getDate() + 30); // Default to montly, updated by real webhook later if needed
-
-  const { error: dbError } = await supabase
-    .from('server_subscriptions')
-    .insert([
+  const { data: licenseRow, error: licenseError } = await supabase
+    .from('licenses')
+    .upsert(
       {
-        guild_id: `PENDING_${licenseKey}`, // Placeholder ID
         license_key: licenseKey,
-        owner_user_id: discordUserId,
-        subscription_status: 'active', // Set to active so validation passes
-        plan_type: 'trilo',
+        owner_discord_user_id: discordUserId || null,
+        status: 'pending_activation',
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'license_key' }
+    )
+    .select('id')
+    .single();
+
+  if (licenseError) {
+    console.error('Supabase license insert error:', licenseError);
+    throw licenseError;
+  }
+
+  const { error: subscriptionError } = await supabase
+    .from('subscriptions')
+    .upsert(
+      {
+        license_id: licenseRow.id,
         stripe_customer_id: customerId,
         stripe_subscription_id: subscriptionId,
-        created_at: now.toISOString(),
-        updated_at: now.toISOString(),
-        activation_slot: 0 // Placeholder slot
-      }
-    ]);
+        stripe_product_id: stripeProductId,
+        status: subscription.status,
+        billing_interval: price?.recurring?.interval || 'month',
+        plan_type: 'trilo',
+        current_period_start: currentPeriodStart?.toISOString(),
+        current_period_end: currentPeriodEnd?.toISOString(),
+        subscription_end_date: currentPeriodEnd?.toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'stripe_subscription_id' }
+    );
 
-  if (dbError) {
-    console.error('Supabase Insert Error:', dbError);
-    // Proceed anyway to send DM if possible, but this is critical
-  } else {
-    console.log('License key stored in Supabase.');
+  if (subscriptionError) {
+    console.error('Supabase subscription insert error:', subscriptionError);
+    throw subscriptionError;
   }
+
+  console.log('License key stored in Supabase normalized tables.');
 
   // 4. Send DM to User
   if (discordUserId) {
@@ -473,4 +499,3 @@ process.on('SIGINT', () => {
     process.exit(0);
   });
 });
-

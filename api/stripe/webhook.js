@@ -122,35 +122,26 @@ async function handleCheckoutFulfillment(session) {
   });
 
   // 3. Insert into Supabase (Pending Activation)
-  const now = new Date();
+  const licenseId = await upsertLicense({
+    licenseKey,
+    discordUserId,
+    status: subscriptionStatus === 'active' || subscriptionStatus === 'trialing'
+      ? 'pending_activation'
+      : 'inactive',
+  });
 
-  const pendingRecord = {
-    guild_id: `PENDING_${licenseKey}`,
-    license_key: licenseKey,
-    owner_user_id: discordUserId,
-    subscription_status: subscriptionStatus,
-    subscription_end_date: currentPeriodEnd?.toISOString(),
-    plan_type: 'trilo',
-    billing_interval: billingInterval,
-    current_period_start: currentPeriodStart?.toISOString(),
-    current_period_end: currentPeriodEnd?.toISOString(),
-    stripe_customer_id: customerId,
-    stripe_subscription_id: subscriptionId,
-    stripe_product_id: stripeProductId,
-    created_at: now.toISOString(),
-    updated_at: now.toISOString(),
-    activation_slot: 0
-  };
+  await upsertSubscription({
+    licenseId,
+    customerId,
+    subscriptionId,
+    stripeProductId,
+    status: subscriptionStatus,
+    billingInterval,
+    currentPeriodStart,
+    currentPeriodEnd,
+  });
 
-  const { error: dbError } = await supabase
-    .from('server_subscriptions')
-    .insert([pendingRecord]);
-
-  if (dbError) {
-    console.error('Supabase Insert Error:', dbError);
-  } else {
-    console.log('License key stored in Supabase.');
-  }
+  console.log('License key stored in Supabase normalized tables.');
 
   // 4. Send DM to User
   if (discordUserId) {
@@ -181,32 +172,119 @@ async function handleSubscriptionUpdated(subscription) {
     ? new Date(subscription.current_period_end * 1000).toISOString()
     : null;
 
-  const { error } = await supabase
-    .from('server_subscriptions')
+  const { data: subscriptionRow, error } = await supabase
+    .from('subscriptions')
     .update({
-      subscription_status: status,
+      status,
       subscription_end_date: currentPeriodEnd,
       current_period_start: currentPeriodStart,
       current_period_end: currentPeriodEnd,
       updated_at: new Date().toISOString(),
     })
-    .eq('stripe_subscription_id', subscriptionId);
+    .eq('stripe_subscription_id', subscriptionId)
+    .select('license_id')
+    .maybeSingle();
 
   if (error) {
     console.error('Supabase subscription update error:', error);
+    return;
+  }
+
+  if (subscriptionRow?.license_id) {
+    await supabase
+      .from('licenses')
+      .update({
+        status: status === 'active' || status === 'trialing' ? 'active' : 'inactive',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', subscriptionRow.license_id);
   }
 }
 
 async function handleSubscriptionDeleted(subscription) {
-  const { error } = await supabase
-    .from('server_subscriptions')
+  const { data: subscriptionRow, error } = await supabase
+    .from('subscriptions')
     .update({
-      subscription_status: 'inactive',
+      status: 'inactive',
       updated_at: new Date().toISOString(),
     })
-    .eq('stripe_subscription_id', subscription.id);
+    .eq('stripe_subscription_id', subscription.id)
+    .select('license_id')
+    .maybeSingle();
 
   if (error) {
     console.error('Supabase subscription delete error:', error);
+    return;
+  }
+
+  if (subscriptionRow?.license_id) {
+    await supabase
+      .from('licenses')
+      .update({
+        status: 'inactive',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', subscriptionRow.license_id);
+  }
+}
+
+async function upsertLicense({ licenseKey, discordUserId, status }) {
+  const { data, error } = await supabase
+    .from('licenses')
+    .upsert(
+      {
+        license_key: licenseKey,
+        owner_discord_user_id: discordUserId || null,
+        status,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'license_key' }
+    )
+    .select('id')
+    .single();
+
+  if (error) {
+    console.error('Supabase license upsert error:', error);
+    throw error;
+  }
+
+  return data.id;
+}
+
+async function upsertSubscription({
+  licenseId,
+  customerId,
+  subscriptionId,
+  stripeProductId,
+  status,
+  billingInterval,
+  currentPeriodStart,
+  currentPeriodEnd,
+}) {
+  if (!licenseId) {
+    return;
+  }
+
+  const { error } = await supabase
+    .from('subscriptions')
+    .upsert(
+      {
+        license_id: licenseId,
+        stripe_customer_id: customerId,
+        stripe_subscription_id: subscriptionId,
+        stripe_product_id: stripeProductId,
+        status,
+        billing_interval: billingInterval,
+        plan_type: 'trilo',
+        current_period_start: currentPeriodStart?.toISOString(),
+        current_period_end: currentPeriodEnd?.toISOString(),
+        subscription_end_date: currentPeriodEnd?.toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'stripe_subscription_id' }
+    );
+
+  if (error) {
+    console.error('Supabase subscription upsert error:', error);
   }
 }
