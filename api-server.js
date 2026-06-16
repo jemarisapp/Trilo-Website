@@ -434,28 +434,46 @@ async function handleSubscriptionFulfillment(session) {
     throw licenseError;
   }
 
-  const { error: subscriptionError } = await supabase
-    .from('subscriptions')
-    .upsert(
-      {
-        license_id: licenseRow.id,
-        stripe_customer_id: customerId,
-        stripe_subscription_id: subscriptionId,
-        stripe_product_id: stripeProductId,
-        status: subscription.status,
-        billing_interval: price?.recurring?.interval || 'month',
-        plan_type: 'trilo',
-        current_period_start: currentPeriodStart?.toISOString(),
-        current_period_end: currentPeriodEnd?.toISOString(),
-        subscription_end_date: currentPeriodEnd?.toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'stripe_subscription_id' }
-    );
+  const subscriptionRow = {
+    license_id: licenseRow.id,
+    stripe_customer_id: customerId,
+    stripe_subscription_id: subscriptionId,
+    stripe_product_id: stripeProductId,
+    status: subscription.status,
+    billing_interval: price?.recurring?.interval || 'month',
+    plan_type: 'trilo',
+    current_period_start: currentPeriodStart?.toISOString(),
+    current_period_end: currentPeriodEnd?.toISOString(),
+    subscription_end_date: currentPeriodEnd?.toISOString(),
+    updated_at: new Date().toISOString(),
+  };
 
-  if (subscriptionError) {
-    console.error('Supabase subscription insert error:', subscriptionError);
-    throw subscriptionError;
+  const { data: existingSubscription, error: lookupError } = await supabase
+    .from('subscriptions')
+    .select('id')
+    .eq('stripe_subscription_id', subscriptionId)
+    .maybeSingle();
+
+  if (lookupError) {
+    console.error('Supabase subscription lookup error:', lookupError);
+    throw lookupError;
+  }
+
+  const subscriptionResult = existingSubscription
+    ? await supabase
+        .from('subscriptions')
+        .update(subscriptionRow)
+        .eq('id', existingSubscription.id)
+    : await supabase
+        .from('subscriptions')
+        .insert({
+          ...subscriptionRow,
+          created_at: new Date().toISOString(),
+        });
+
+  if (subscriptionResult.error) {
+    console.error('Supabase subscription write error:', subscriptionResult.error);
+    throw subscriptionResult.error;
   }
 
   console.log('License key stored in Supabase normalized tables.');

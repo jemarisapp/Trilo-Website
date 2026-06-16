@@ -265,26 +265,45 @@ async function upsertSubscription({
     return;
   }
 
-  const { error } = await supabase
-    .from('subscriptions')
-    .upsert(
-      {
-        license_id: licenseId,
-        stripe_customer_id: customerId,
-        stripe_subscription_id: subscriptionId,
-        stripe_product_id: stripeProductId,
-        status,
-        billing_interval: billingInterval,
-        plan_type: 'trilo',
-        current_period_start: currentPeriodStart?.toISOString(),
-        current_period_end: currentPeriodEnd?.toISOString(),
-        subscription_end_date: currentPeriodEnd?.toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'stripe_subscription_id' }
-    );
+  const subscriptionRow = {
+    license_id: licenseId,
+    stripe_customer_id: customerId,
+    stripe_subscription_id: subscriptionId,
+    stripe_product_id: stripeProductId,
+    status,
+    billing_interval: billingInterval,
+    plan_type: 'trilo',
+    current_period_start: currentPeriodStart?.toISOString(),
+    current_period_end: currentPeriodEnd?.toISOString(),
+    subscription_end_date: currentPeriodEnd?.toISOString(),
+    updated_at: new Date().toISOString(),
+  };
 
-  if (error) {
-    console.error('Supabase subscription upsert error:', error);
+  const { data: existing, error: lookupError } = await supabase
+    .from('subscriptions')
+    .select('id')
+    .eq('stripe_subscription_id', subscriptionId)
+    .maybeSingle();
+
+  if (lookupError) {
+    console.error('Supabase subscription lookup error:', lookupError);
+    throw lookupError;
+  }
+
+  const result = existing
+    ? await supabase
+        .from('subscriptions')
+        .update(subscriptionRow)
+        .eq('id', existing.id)
+    : await supabase
+        .from('subscriptions')
+        .insert({
+          ...subscriptionRow,
+          created_at: new Date().toISOString(),
+        });
+
+  if (result.error) {
+    console.error('Supabase subscription write error:', result.error);
+    throw result.error;
   }
 }
