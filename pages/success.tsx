@@ -1,4 +1,4 @@
-import { CheckCircle, Key, Copy, Check as CheckIcon } from 'lucide-react';
+import { CheckCircle, Key, Copy, Check as CheckIcon, ExternalLink, Terminal } from 'lucide-react';
 import { Button } from '../components/UI/Button';
 import { useEffect, useState } from 'react';
 
@@ -82,146 +82,185 @@ export default function Success() {
   };
 
   return (
-    <div className="min-h-screen bg-trilo-bg text-white flex items-center justify-center px-4">
-      <div className="max-w-2xl w-full">
-        {/* Success Icon */}
-        <div className="flex justify-center mb-8">
-          <div className="w-24 h-24 rounded-full bg-green-500/20 flex items-center justify-center">
-            <CheckCircle size={48} className="text-green-400" />
+    <div className="min-h-screen field-grid text-white flex items-center justify-center px-4 pt-36 pb-20">
+      <div className="noise-bg fixed inset-0 z-[-1]" />
+      
+      <div className="max-w-2xl w-full relative z-10">
+        
+        {/* Stadium Gate pass verified label */}
+        <div className="flex justify-center mb-6">
+          <div className="border-2 border-[#2dc770] bg-[#2dc770]/10 px-5 py-1.5 flex items-center gap-2">
+            <CheckCircle size={14} className="text-[#2dc770] animate-pulse" />
+            <span className="font-heading font-extrabold text-[#2dc770] text-xs tracking-widest uppercase">GATE PASS VERIFIED</span>
           </div>
         </div>
 
         {/* Heading */}
-        <h1 className="text-4xl md:text-5xl font-heading font-bold text-center mb-4">
-          Payment Successful!
+        <h1 className="text-5xl md:text-7xl font-heading font-extrabold text-center uppercase tracking-tight text-white mb-2 leading-none athletic-tracking">
+          PAYMENT SUCCESSFUL
         </h1>
 
-        <p className="text-xl text-gray-300 text-center mb-8">
-          Your Trilo license is ready to activate.
+        <p className="text-xs text-gray-400 text-center mb-12 uppercase tracking-widest font-heading font-semibold">
+          Your Trilo license is active and ready to deploy.
         </p>
 
-        {/* License Key Notice */}
-        <div className="bg-trilo-orange/10 border border-trilo-orange/30 rounded-2xl p-6 mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-trilo-orange/20 flex items-center justify-center">
-              <Key size={20} className="text-trilo-orange" />
+        {/* Stadium Ticket Pass - License Key */}
+        <div className="relative bg-[#181a1c] border-2 border-trilo-orange/30 p-6 lg:p-8 mb-12 shadow-2xl relative overflow-hidden">
+          {/* Perforated circular ticket punches */}
+          <div className="absolute left-[-10px] top-1/2 -translate-y-1/2 w-5 h-10 rounded-r-full bg-[#111315] border-r-2 border-y-2 border-trilo-orange/30 z-10" />
+          <div className="absolute right-[-10px] top-1/2 -translate-y-1/2 w-5 h-10 rounded-l-full bg-[#111315] border-l-2 border-y-2 border-trilo-orange/30 z-10" />
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-6 pb-6 border-b border-white/5 relative z-20">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-trilo-orange/10 border border-trilo-orange/30 flex items-center justify-center text-trilo-orange flex-shrink-0">
+                <Key size={18} />
+              </div>
+              <div>
+                <span className="text-[9px] font-mono text-trilo-orange uppercase tracking-widest block font-bold">REGISTRY TICKET</span>
+                <h2 className="text-lg font-heading font-extrabold text-white uppercase tracking-wider">YOUR LICENSE KEY</h2>
+              </div>
             </div>
-            <h2 className="text-xl font-heading font-bold">Your License Key</h2>
+
+            {/* Barcode styling */}
+            <div className="opacity-60 flex-shrink-0">
+              <svg className="w-24 h-8 fill-current text-gray-500" viewBox="0 0 100 30">
+                <rect x="0" width="3" height="30" />
+                <rect x="5" width="1" height="30" />
+                <rect x="8" width="2" height="30" />
+                <rect x="12" width="4" height="30" />
+                <rect x="18" width="1" height="30" />
+                <rect x="21" width="3" height="30" />
+                <rect x="26" width="2" height="30" />
+                <rect x="30" width="1" height="30" />
+                <rect x="33" width="4" height="30" />
+                <rect x="39" width="2" height="30" />
+                <rect x="43" width="1" height="30" />
+                <rect x="46" width="3" height="30" />
+                <rect x="51" width="2" height="30" />
+                <rect x="55" width="1" height="30" />
+                <rect x="58" width="4" height="30" />
+                <rect x="64" width="2" height="30" />
+                <rect x="68" width="3" height="30" />
+                <rect x="73" width="1" height="30" />
+                <rect x="76" width="2" height="30" />
+                <rect x="80" width="4" height="30" />
+                <rect x="86" width="1" height="30" />
+                <rect x="89" width="3" height="30" />
+                <rect x="94" width="2" height="30" />
+                <rect x="98" width="2" height="30" />
+              </svg>
+              <div className="text-[8px] font-mono text-gray-500 text-center tracking-widest mt-1">SEC: COMMISH | ACTIVE</div>
+            </div>
           </div>
 
-          {loading && (
-            <div className="text-center py-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-trilo-orange mx-auto"></div>
-              <p className="text-gray-400 text-sm mt-2">Retrieving your license key...</p>
-            </div>
-          )}
-
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-4">
-              <p className="text-red-200 text-sm">{error}</p>
-            </div>
-          )}
-
-          {licenseKey && (
-            <>
-              <div className="bg-trilo-bg border border-white/10 rounded-lg p-4 mb-4 flex items-center justify-between gap-4">
-                <code className="text-lg font-mono text-trilo-orange font-bold flex-1">
-                  {licenseKey}
-                </code>
-                <button
-                  onClick={copyToClipboard}
-                  className="flex-shrink-0 p-2 bg-trilo-orange/20 hover:bg-trilo-orange/30 rounded-lg transition-colors"
-                  title="Copy to clipboard"
-                >
-                  {copied ? <CheckIcon size={20} className="text-green-400" /> : <Copy size={20} className="text-trilo-orange" />}
-                </button>
+          <div className="relative z-20">
+            {loading && (
+              <div className="text-center py-6">
+                <div className="animate-pulse font-mono text-xs text-trilo-yellow uppercase tracking-widest">
+                  [ BLINKING SIGNAL... FETCHING KEY ]
+                </div>
               </div>
-              <p className="text-gray-300 text-sm mb-2">
-                Your license key has also been sent to your Discord DM when Discord delivery is available.
-              </p>
-            </>
-          )}
+            )}
 
-          <p className="text-trilo-orange text-sm font-semibold">
-            ✨ One license activates one Discord server
-          </p>
+            {error && (
+              <div className="bg-red-500/5 border border-red-500/20 p-4 mb-4">
+                <p className="text-red-400 font-mono text-xs uppercase tracking-wide">{error}</p>
+              </div>
+            )}
+
+            {licenseKey && (
+              <>
+                <div className="bg-[#0a0c0e] border border-white/10 p-4 mb-4 flex items-center justify-between gap-4">
+                  <code className="text-lg lg:text-xl font-mono text-trilo-yellow font-extrabold tracking-widest flex-1 overflow-x-auto whitespace-nowrap scrollbar-hide">
+                    {licenseKey}
+                  </code>
+                  <button
+                    onClick={copyToClipboard}
+                    className="flex-shrink-0 p-2.5 bg-trilo-orange/10 border border-trilo-orange/30 hover:bg-trilo-orange text-trilo-orange hover:text-white transition-colors"
+                    title="Copy to clipboard"
+                  >
+                    {copied ? <CheckIcon size={16} className="text-[#2dc770]" /> : <Copy size={16} />}
+                  </button>
+                </div>
+                <p className="text-gray-400 text-xs font-sans leading-relaxed mb-4">
+                  Your license key has also been dispatched to your Discord DM. Save this key in a secure location.
+                </p>
+              </>
+            )}
+
+            <div className="pt-4 border-t border-white/5 flex justify-between items-center text-[10px] font-mono text-trilo-orange font-bold uppercase tracking-widest">
+              <span>LIMIT: 1 DISCORD SERVER</span>
+              <span className="animate-pulse text-[#2dc770]">★ ACTIVE STADIUM TICKET</span>
+            </div>
+          </div>
         </div>
 
-        {/* What's Next */}
-        <div className="bg-trilo-elevated/40 border border-white/10 rounded-2xl p-8 mb-8">
-          <h2 className="text-2xl font-heading font-bold mb-6 text-center">
-            How to Activate
+        {/* Clipboard Manual Checklist */}
+        <div className="relative bg-[#181a1c] border-2 border-white/10 p-8 mb-12 shadow-xl">
+          {/* Clipboard metal clamp */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-3 bg-[#27292c] border-b border-l border-r border-white/10" />
+
+          <h2 className="text-2xl font-heading font-extrabold text-white text-center uppercase tracking-wider mb-8 mt-2">
+            ACTIVATION PLAYBOOK
           </h2>
 
-          <div className="space-y-4">
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-trilo-orange/20 flex items-center justify-center text-trilo-orange font-bold">
-                1
+          <div className="space-y-6">
+            {[
+              {
+                num: "01",
+                title: "Verify Roster Receipt",
+                desc: "Stripe sends a detailed payment confirmation to your checkout email address."
+              },
+              {
+                num: "02",
+                title: "Run Activation Command",
+                desc: "Execute the server command inside your target Discord server to bind registration:",
+                code: `/admin activate key: ${licenseKey || 'TRILO-XXXX-XXXX-XXXX'}`
+              },
+              {
+                num: "03",
+                title: "Deploy Matchups",
+                desc: "All dynasty commands are now unlocked. Try uploading screenshots to test OCR matchups:",
+                code: "/matchups create-from-image"
+              },
+              {
+                num: "04",
+                title: "Transfer Server License",
+                desc: "Need to reallocate your league license? Run the deactivation command first in the old server:",
+                code: "/admin deactivate"
+              }
+            ].map((step, idx) => (
+              <div key={idx} className="flex gap-4 items-start">
+                <div className="flex-shrink-0 w-7 h-7 border border-trilo-orange/30 bg-trilo-orange/5 text-trilo-orange font-heading font-extrabold text-xs flex items-center justify-center">
+                  {step.num}
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-heading font-extrabold text-white text-base uppercase tracking-wider mb-1 leading-none">{step.title}</h3>
+                  <p className="text-gray-400 text-xs font-sans leading-relaxed mb-2">
+                    {step.desc}
+                  </p>
+                  {step.code && (
+                    <div className="bg-[#0a0c0e] border border-white/5 px-3 py-1.5 font-mono text-[10px] text-trilo-yellow w-fit">
+                      {step.code}
+                    </div>
+                  )}
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-1">Check Your Email</h3>
-                <p className="text-gray-400 text-sm">
-                  Stripe sends your payment receipt to the email you used at checkout.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-trilo-orange/20 flex items-center justify-center text-trilo-orange font-bold">
-                2
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-1">Activate in Discord</h3>
-                <p className="text-gray-400 text-sm">
-                  Go to your Discord server and run <code className="bg-white/10 px-2 py-1 rounded">/admin activate TRILO-XXXX-XXXX-XXXX</code> with your license key.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-trilo-orange/20 flex items-center justify-center text-trilo-orange font-bold">
-                3
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-1">Start Using Trilo</h3>
-                <p className="text-gray-400 text-sm">
-                  All commands are now unlocked! Try <code className="bg-white/10 px-2 py-1 rounded">/matchups create</code> or <code className="bg-white/10 px-2 py-1 rounded">/teams assign-user</code> to get started.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-trilo-orange/20 flex items-center justify-center text-trilo-orange font-bold">
-                💡
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-1">Moving Servers Later</h3>
-                <p className="text-gray-400 text-sm">
-                  Need to move Trilo? Run <code className="bg-white/10 px-2 py-1 rounded">/admin deactivate</code> in the old server, then activate the license in the new one.
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
-        </div>
-
-        {/* Receipt Notice */}
-        <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-6 mb-8">
-          <p className="text-blue-200 text-sm text-center">
-            A receipt has been sent to your email. You can check your activation status anytime with <code className="bg-white/10 px-2 py-1 rounded">/admin license-info</code>.
-          </p>
         </div>
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="/">
-            <Button variant="secondary" className="w-full sm:w-auto">
+          <a href="/" className="w-full sm:w-auto">
+            <Button variant="secondary" className="w-full uppercase tracking-wider text-xs font-heading font-bold">
               Back to Home
             </Button>
           </a>
 
-          <a href="https://discord.com/channels/@me" target="_blank" rel="noopener noreferrer">
-            <Button variant="primary" className="w-full sm:w-auto">
-              Open Discord
+          <a href="https://discord.com/channels/@me" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+            <Button variant="primary" className="w-full uppercase tracking-wider text-xs font-heading font-bold flex items-center justify-center gap-2">
+              Open Discord <ExternalLink size={12} />
             </Button>
           </a>
         </div>
