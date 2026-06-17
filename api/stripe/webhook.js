@@ -198,6 +198,10 @@ async function handleSubscriptionUpdated(subscription) {
         updated_at: new Date().toISOString(),
       })
       .eq('id', subscriptionRow.license_id);
+
+    if (status !== 'active' && status !== 'trialing') {
+      await deactivateLicenseActivations(subscriptionRow.license_id);
+    }
   }
 }
 
@@ -225,6 +229,25 @@ async function handleSubscriptionDeleted(subscription) {
         updated_at: new Date().toISOString(),
       })
       .eq('id', subscriptionRow.license_id);
+
+    await deactivateLicenseActivations(subscriptionRow.license_id);
+  }
+}
+
+async function deactivateLicenseActivations(licenseId) {
+  const { error } = await supabase
+    .from('license_activations')
+    .update({
+      status: 'inactive',
+      deactivated_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('license_id', licenseId)
+    .is('deactivated_at', null);
+
+  if (error) {
+    console.error('Supabase license activation deactivate error:', error);
+    throw error;
   }
 }
 
