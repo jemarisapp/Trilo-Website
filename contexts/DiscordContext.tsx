@@ -21,7 +21,7 @@ export const DiscordProvider: React.FC<{ children: ReactNode }> = ({ children })
     const [isProcessingAuth, setIsProcessingAuth] = useState(false);
     const navigate = useNavigate();
 
-    // Load from localStorage on mount
+    // Load display state from localStorage immediately, then verify the signed server session.
     useEffect(() => {
         const savedUser = localStorage.getItem('discordUser');
         if (savedUser) {
@@ -32,7 +32,22 @@ export const DiscordProvider: React.FC<{ children: ReactNode }> = ({ children })
                 localStorage.removeItem('discordUser');
             }
         }
-        setIsLoading(false);
+
+        fetch('/api/auth/me')
+            .then(res => {
+                if (!res.ok) throw new Error('No active Discord session');
+                return res.json();
+            })
+            .then(data => {
+                if (data.user) {
+                    setDiscordUser(data.user);
+                }
+            })
+            .catch(() => {
+                localStorage.removeItem('discordUser');
+                setDiscordUser(null);
+            })
+            .finally(() => setIsLoading(false));
     }, []);
 
     // Sync to localStorage
@@ -85,6 +100,7 @@ export const DiscordProvider: React.FC<{ children: ReactNode }> = ({ children })
     }, [discordUser, isProcessingAuth]);
 
     const logout = () => {
+        fetch('/api/auth/logout', { method: 'POST' }).catch(() => undefined);
         setDiscordUser(null);
     };
 
@@ -115,9 +131,6 @@ export const DiscordProvider: React.FC<{ children: ReactNode }> = ({ children })
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    discordUserId: discordUser.id,
-                }),
             });
 
             const data = await response.json();

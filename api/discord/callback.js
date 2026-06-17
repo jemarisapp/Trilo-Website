@@ -2,6 +2,7 @@
  * Vercel Serverless Function: Discord OAuth Callback
  * GET /api/discord/callback
  */
+import { setDiscordSessionCookie } from '../_helpers.js';
 
 export default async function handler(req, res) {
   // Only allow GET
@@ -51,16 +52,19 @@ export default async function handler(req, res) {
     });
 
     const userData = await userResponse.json();
+    const user = {
+      id: userData.id,
+      username: userData.username,
+      discriminator: userData.discriminator,
+      avatar: userData.avatar,
+      email: userData.email,
+    };
+
+    setDiscordSessionCookie(res, user);
 
     res.json({
       success: true,
-      user: {
-        id: userData.id,
-        username: userData.username,
-        discriminator: userData.discriminator,
-        avatar: userData.avatar,
-        email: userData.email,
-      },
+      user,
     });
   } catch (error) {
     console.error('Discord OAuth error:', error);

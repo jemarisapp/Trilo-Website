@@ -61,6 +61,7 @@ export const Header: React.FC = () => {
     { name: 'Features', path: '/features' },
     { name: 'Pricing', path: '/pricing' },
     { name: 'Setup', path: '/setup' },
+    { name: 'Account', path: '/account' },
   ];
 
   return (
@@ -124,7 +125,7 @@ export const Header: React.FC = () => {
           </div>
 
           {discordUser ? (
-            <div className="flex items-center gap-3 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
+            <Link to="/account" className="flex items-center gap-3 bg-white/5 px-3 py-1.5 rounded-full border border-white/10 hover:border-trilo-orange/50 transition-colors">
               {discordUser.avatar ? (
                 <img
                   src={`https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`}
@@ -139,7 +140,7 @@ export const Header: React.FC = () => {
               <span className="text-xs font-semibold text-gray-200">
                 {discordUser.username}
               </span>
-            </div>
+            </Link>
           ) : (
             <Button
               variant="primary"
@@ -201,7 +202,11 @@ export const Header: React.FC = () => {
           </div>
 
           {discordUser ? (
-            <div className="flex items-center gap-4 bg-white/5 p-4 rounded-none border border-white/10">
+            <Link
+              to="/account"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-4 bg-white/5 p-4 rounded-none border border-white/10"
+            >
               {discordUser.avatar ? (
                 <img
                   src={`https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`}
@@ -217,7 +222,7 @@ export const Header: React.FC = () => {
                 <p className="font-bold text-white">{discordUser.username}</p>
                 <p className="text-gray-500 text-xs">Connected via Discord</p>
               </div>
-            </div>
+            </Link>
           ) : (
             <Button
               size="lg"

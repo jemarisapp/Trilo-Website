@@ -12,6 +12,7 @@ This repository contains the current public website for Trilo, including:
 - an interactive setup guide with progress tracking
 - Discord OAuth for subscriber identity
 - Stripe checkout, success, and customer portal flows
+- signed Discord account sessions for license lookup
 - Vercel API handlers for billing, licensing, and webhooks
 
 ## Current Stack
@@ -78,10 +79,19 @@ Common variables used by the site and API handlers:
 - `STRIPE_WEBHOOK_SECRET`
 - `DISCORD_CLIENT_ID`
 - `DISCORD_CLIENT_SECRET`
+- `DISCORD_SESSION_SECRET`
 - `DISCORD_TOKEN`
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SUPABASE_ANON_KEY`
+
+`DISCORD_SESSION_SECRET` is server-side only and signs the HttpOnly Discord session cookie used by `/account`, `/api/licenses/me`, and `/api/stripe/portal`. Generate at least 32 random characters and set the same value in every production environment.
+
+Example:
+
+```bash
+openssl rand -base64 32
+```
 
 ## Stripe Reset Checklist
 
@@ -103,6 +113,18 @@ When recreating Stripe billing for the current subscription model:
    - `customer.subscription.deleted`
 6. Set `STRIPE_WEBHOOK_SECRET` to the webhook signing secret.
 7. Run a test checkout and confirm Supabase gets rows in `licenses` and `subscriptions`.
+
+## Account Page
+
+The `/account` page lets signed-in Discord users view their Trilo licenses without entering an email or license key.
+
+Security model:
+
+- Discord OAuth callback verifies the user with Discord.
+- The API sets a signed, HttpOnly `trilo_discord_session` cookie.
+- `/api/licenses/me` reads the signed cookie and queries Supabase by `licenses.owner_discord_user_id`.
+- `/api/stripe/portal` reads the signed cookie before creating a Stripe Billing Portal session.
+- The frontend can store display-only Discord user data in localStorage, but account/license APIs do not trust browser-sent Discord IDs.
 
 ## Project Structure
 
