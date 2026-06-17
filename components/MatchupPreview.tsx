@@ -32,7 +32,7 @@ export const MatchupPreview: React.FC = () => {
     }, []);
 
     return (
-        <Card hover={false} className="relative z-10 p-0 border-white/10 shadow-2xl h-full flex flex-col scale-100 origin-center transition-transform duration-500 bg-[#313338]">
+        <Card hover={false} className="relative z-10 p-0 border-white/10 shadow-2xl h-full flex flex-col scale-100 origin-center transition-transform duration-500 bg-[#313338] overflow-hidden">
             {/* Discord Header */}
             <div className="bg-trilo-elevated/50 p-3 border-b border-white/5 flex items-center justify-between z-20 relative">
                 <div className="flex items-center gap-2">
@@ -46,7 +46,7 @@ export const MatchupPreview: React.FC = () => {
             </div>
 
             {/* Content Area with Carousel */}
-            <div className="flex-1 relative overflow-visible bg-[#313338] min-h-[300px]">
+            <div className="flex-1 relative overflow-hidden bg-[#313338] min-h-[300px]">
                 <AnimatePresence mode="wait">
                     {currentSlide === 0 && (
                         <motion.div
@@ -104,9 +104,9 @@ export const MatchupPreview: React.FC = () => {
                                 initial={{ opacity: 0, scale: 0.9, y: 10, rotate: -2 }}
                                 animate={{ opacity: 1, scale: 1, y: 0, rotate: 1 }}
                                 transition={{ delay: 1.5, duration: 0.5 }}
-                                className="absolute top-[130px] lg:top-[140px] left-[60px] lg:left-[60px] w-[280px] lg:w-[420px] h-[160px] lg:h-[240px] bg-[#2B2D31] rounded-lg border-l-4 border-trilo-orange shadow-2xl p-3 lg:p-4 z-20"
+                                className="absolute top-[120px] lg:top-[130px] left-[40px] lg:left-[55px] w-[280px] lg:w-[410px] h-[160px] lg:h-[220px] bg-[#2B2D31] rounded-lg border-l-4 border-trilo-orange shadow-2xl p-3 lg:p-4 z-20"
                             >
-                                <div className="w-full h-28 lg:h-44 bg-gray-900 rounded mb-2 overflow-hidden relative group">
+                                <div className="w-full h-26 lg:h-38 bg-gray-900 rounded mb-2 overflow-hidden relative group">
                                     <img
                                         src="/schedule.JPG"
                                         alt="Schedule"

@@ -64,15 +64,15 @@ export const Header: React.FC = () => {
   ];
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-trilo-dark/80 backdrop-blur-md border-b border-white/5 py-3' : 'bg-transparent py-5'}`}>
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[#111315]/95 backdrop-blur-md border-b-2 border-trilo-orange/20 py-3' : 'bg-transparent py-5'}`}>
       <nav className="container mx-auto px-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3 group">
           <img
             src="/trilo-logo.JPG"
             alt="Trilo"
-            className="w-10 h-10 rounded-xl transition-transform group-hover:scale-110"
+            className="w-9 h-9 rounded-none border border-white/10 transition-transform group-hover:scale-105"
           />
-          <span className="font-heading font-extrabold text-2xl tracking-tight hidden sm:block">TRILO</span>
+          <span className="font-heading font-extrabold text-3xl tracking-wider uppercase text-white hidden sm:block">TRILO</span>
         </Link>
 
         {/* Desktop Nav */}
@@ -81,7 +81,7 @@ export const Header: React.FC = () => {
             <Link
               key={link.path}
               to={link.path}
-              className={`text-sm font-semibold transition-colors hover:text-trilo-orange ${location.pathname === link.path ? 'text-trilo-orange' : 'text-gray-400'}`}
+              className={`text-xs uppercase tracking-widest font-heading font-bold transition-all relative py-1 hover:text-trilo-orange ${location.pathname === link.path ? 'text-trilo-orange border-b-2 border-trilo-orange' : 'text-gray-400'}`}
             >
               {link.name}
             </Link>
@@ -96,7 +96,7 @@ export const Header: React.FC = () => {
           >
             <button
               onClick={() => setToolsOpen(true)}
-              className={`flex items-center gap-1 text-sm font-semibold transition-colors hover:text-trilo-orange ${toolsItems.some((t) => location.pathname === t.path) ? 'text-trilo-orange' : 'text-gray-400'}`}
+              className={`flex items-center gap-1 text-xs uppercase tracking-widest font-heading font-bold transition-colors hover:text-trilo-orange ${toolsItems.some((t) => location.pathname === t.path) ? 'text-trilo-orange' : 'text-gray-400'}`}
             >
               Tools
               <ChevronDown
@@ -107,13 +107,13 @@ export const Header: React.FC = () => {
 
             {toolsOpen && (
               <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50">
-                <div className="w-52 rounded-xl bg-trilo-card border border-white/10 shadow-xl overflow-hidden">
+                <div className="w-52 rounded-none bg-trilo-card border-2 border-trilo-orange/30 shadow-xl overflow-hidden">
                   {toolsItems.map((item) => (
                     <Link
                       key={item.path}
                       to={item.path}
                       onClick={() => setToolsOpen(false)}
-                      className={`block px-4 py-3 text-sm font-semibold transition-colors hover:bg-trilo-orange/10 hover:text-trilo-orange ${location.pathname === item.path ? 'text-trilo-orange' : 'text-gray-300'}`}
+                      className={`block px-4 py-3 text-xs uppercase tracking-widest font-heading font-bold transition-colors hover:bg-trilo-orange/10 hover:text-trilo-orange ${location.pathname === item.path ? 'text-trilo-orange' : 'text-gray-300'}`}
                     >
                       {item.name}
                     </Link>
@@ -159,13 +159,13 @@ export const Header: React.FC = () => {
 
       {/* Mobile Nav Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 top-[72px] bg-trilo-dark z-40 md:hidden flex flex-col p-6 gap-6">
+        <div className="fixed inset-0 top-[72px] bg-[#111315] z-40 md:hidden flex flex-col p-6 gap-6">
           {navLinks.map((link) => (
             <Link
               key={link.path}
               to={link.path}
               onClick={() => setIsOpen(false)}
-              className="text-2xl font-heading font-bold"
+              className="text-3xl font-heading font-extrabold uppercase tracking-wider text-white hover:text-trilo-orange"
             >
               {link.name}
             </Link>
@@ -175,22 +175,22 @@ export const Header: React.FC = () => {
           <div>
             <button
               onClick={() => setMobileToolsOpen((prev) => !prev)}
-              className="flex items-center gap-2 text-2xl font-heading font-bold w-full text-left"
+              className="flex items-center gap-2 text-3xl font-heading font-extrabold uppercase tracking-wider w-full text-left text-white hover:text-trilo-orange"
             >
               Tools
               <ChevronDown
-                size={20}
+                size={24}
                 className={`transition-transform duration-200 mt-1 ${mobileToolsOpen ? 'rotate-180' : ''}`}
               />
             </button>
             {mobileToolsOpen && (
-              <div className="mt-3 ml-2 flex flex-col gap-1 border-l-2 border-trilo-orange/40 pl-4">
+              <div className="mt-3 ml-2 flex flex-col gap-1 border-l-2 border-trilo-orange pl-4">
                 {toolsItems.map((item) => (
                   <Link
                     key={item.path}
                     to={item.path}
                     onClick={() => { setIsOpen(false); setMobileToolsOpen(false); }}
-                    className="flex items-center text-base font-semibold text-gray-300 hover:text-trilo-orange transition-colors"
+                    className="flex items-center text-lg font-heading font-bold uppercase tracking-wider text-gray-300 hover:text-trilo-orange transition-colors"
                     style={{ minHeight: '44px' }}
                   >
                     {item.name}
@@ -201,7 +201,7 @@ export const Header: React.FC = () => {
           </div>
 
           {discordUser ? (
-            <div className="flex items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/5">
+            <div className="flex items-center gap-4 bg-white/5 p-4 rounded-none border border-white/10">
               {discordUser.avatar ? (
                 <img
                   src={`https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`}

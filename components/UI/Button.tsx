@@ -14,19 +14,19 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyles = "inline-flex items-center justify-center font-heading font-semibold transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none rounded-lg";
+  const baseStyles = "inline-flex items-center justify-center font-heading font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:pointer-events-none rounded-none border-2 text-center select-none shine-sweep";
 
   const variants = {
-    primary: "bg-gradient-to-br from-trilo-orange to-trilo-yellow text-white electric-glow hover:shadow-[0_0_25px_rgba(255,107,53,0.4)]",
-    secondary: "bg-trilo-elevated text-white hover:bg-[#3D3D3D] border border-white/10",
-    ghost: "bg-transparent text-white hover:bg-white/5",
-    discord: "bg-[#5865F2] text-white hover:bg-[#4752C4]"
+    primary: "border-trilo-orange bg-trilo-orange text-white hover:bg-transparent hover:text-trilo-orange shadow-[4px_4px_0px_rgba(255,107,53,0.2)] hover:shadow-none",
+    secondary: "border-white/20 bg-transparent text-white hover:border-white hover:bg-white/5",
+    ghost: "border-transparent bg-transparent text-white hover:bg-white/5",
+    discord: "border-[#5865F2] bg-[#5865F2] text-white hover:bg-transparent hover:text-[#5865F2]"
   };
 
   const sizes = {
-    sm: "px-3 py-1.5 text-sm",
-    md: "px-5 py-2.5 text-base",
-    lg: "px-8 py-4 text-lg"
+    sm: "px-4 py-1.5 text-xs tracking-widest",
+    md: "px-6 py-2.5 text-sm tracking-wider",
+    lg: "px-8 py-3.5 text-base tracking-widest"
   };
 
   return (
